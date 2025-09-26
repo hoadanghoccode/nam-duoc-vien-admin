@@ -1,11 +1,11 @@
-import React, { use, useEffect } from "react";
-import { Card, Row, Col, Statistic, Typography } from "antd";
 import {
   CalendarOutlined,
-  UserOutlined,
-  EnvironmentOutlined,
   DollarOutlined,
+  EnvironmentOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { Card, Col, Row, Statistic, Typography } from "antd";
+import React, { useEffect } from "react";
 import { authen } from "../api/apiEndPoint";
 
 const { Title } = Typography;

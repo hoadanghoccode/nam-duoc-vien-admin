@@ -1,6 +1,7 @@
 // src/store/authen/authSlice.ts
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { authen } from 'src/api/apiEndPoint';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { authen } from "../../api/apiEndPoint";
+// import { authen } from 'src/api/apiEndPoint';
 
 interface RegisterResponse {
   statusCode?: number;
@@ -29,7 +30,7 @@ const initialState: RegisterState = {
 
 // Async thunk cho đăng ký
 export const registerAsync = createAsyncThunk(
-  'auth/register',
+  "auth/register",
   async (
     data: {
       displayName: string;
@@ -39,7 +40,7 @@ export const registerAsync = createAsyncThunk(
       date_of_birth: string;
       gender: string;
     },
-    { rejectWithValue },
+    { rejectWithValue }
   ) => {
     try {
       const response = await authen.register(data);
@@ -53,18 +54,18 @@ export const registerAsync = createAsyncThunk(
         err?.response?.data?.errorMessage ||
         err?.response?.data?.message ||
         err.message ||
-        'Đăng ký thất bại!';
+        "Đăng ký thất bại!";
       return rejectWithValue({
         statusCode,
         ...err?.response?.data,
         errorMessage,
       });
     }
-  },
+  }
 );
 
 const registerSlice = createSlice({
-  name: 'register',
+  name: "register",
   initialState,
   reducers: {
     resetRegisterState: (state) => {

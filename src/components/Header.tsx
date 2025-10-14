@@ -1,15 +1,17 @@
-import React from "react";
-import { Layout, Button, Space, Avatar, Dropdown, Typography } from "antd";
 import {
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserOutlined,
   SettingOutlined,
-  LogoutOutlined,
-  BellOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
+import { Avatar, Button, Dropdown, Layout, Space, Typography } from "antd";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import authorizedAxiosInstance from "../services/Axios";
+import store from "../store/Store";
+import { setAccessToken } from "../store/authen/authSlice";
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -19,20 +21,26 @@ interface HeaderProps {
   onToggle: () => void;
 }
 
-// Dọn local + (tùy bạn) gọi API logout server
-export const handleLogout = async () => {
-  try {
-    const result = await authorizedAxiosInstance.post("/Authentication/Logout");
-    console.log("Logout result", result);
-    if (result?.data?.statusCode) {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userInfo");
-    }
-  } catch {}
-};
-
 const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
+  const navigate = useNavigate();
+
+  // Dọn local + (tùy bạn) gọi API logout server
+  const handleLogout = async () => {
+    try {
+      const result = await authorizedAxiosInstance.post(
+        "/Authentication/Logout"
+      );
+      console.log("Logout result", result);
+      if (result?.data?.statusCode === 200) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userInfo");
+        store.dispatch(setAccessToken(null));
+        navigate("auth/login");
+      }
+    } catch {}
+  };
+
   const userMenuItems: MenuProps["items"] = [
     {
       key: "profile",
@@ -91,15 +99,25 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
             fontSize: "16px",
             width: 64,
             height: 64,
+            border: "none",
+            boxShadow: "none",
+            outline: "none",
           }}
+          onMouseDown={(e) => e.preventDefault()}
         />
-        <Text strong style={{ fontSize: "18px", marginLeft: "16px" }}>
+        {/* <Text strong style={{ fontSize: "18px", marginLeft: "16px" }}>
           Sport Booking Admin
-        </Text>
+        </Text> */}
       </div>
 
       <Space size="middle">
-        <Button type="text" icon={<BellOutlined />} size="large" />
+        {/* <Button
+          type="text"
+          style={{ border: "none", boxShadow: "none", outline: "none" }}
+          onMouseDown={(e) => e.preventDefault()}
+          icon={<BellOutlined />}
+          size="large"
+        /> */}
 
         <Dropdown
           menu={{

@@ -1,17 +1,14 @@
 import {
-  CalendarOutlined,
-  CreditCardOutlined,
   DashboardOutlined,
   EnvironmentOutlined,
   FileTextOutlined,
-  SettingOutlined,
-  TrophyOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import logo from "../../src/assets/logo/logon.png";
 
 const { Sider } = Layout;
 
@@ -30,93 +27,60 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       label: "Dashboard",
     },
     {
-      key: "booking",
-      icon: <CalendarOutlined />,
-      label: "Quản lý đặt sân",
+      key: "content",
+      icon: <FileTextOutlined />,
+      label: "Quản lý nội dung",
       children: [
         {
-          key: "/booking/list",
-          label: "Danh sách đặt sân",
+          key: "/content/about-us",
+          label: "Về chúng tôi",
         },
         {
-          key: "/booking/calendar",
-          label: "Lịch đặt sân",
+          key: "/content/dong-y-intro",
+          label: "Giới thiệu Đông Y",
         },
         {
-          key: "/booking/statistics",
-          label: "Thống kê đặt sân",
+          key: "/content/terms-of-service",
+          label: "Điều khoản dịch vụ",
+        },
+        {
+          key: "/content/privacy-policy",
+          label: "Chính sách bảo mật",
+        },
+        {
+          key: "/content/contact-info",
+          label: "Thông tin liên hệ",
+        },
+        {
+          key: "/content/faq",
+          label: "Câu hỏi thường gặp",
+        },
+        {
+          key: "/content/user-guide",
+          label: "Hướng dẫn sử dụng",
         },
       ],
     },
+
     {
-      key: "venue",
-      icon: <EnvironmentOutlined />,
-      label: "Quản lý sân thể thao",
-      children: [
-        {
-          key: "/venue/list",
-          label: "Danh sách sân",
-        },
-        {
-          key: "/venue/add",
-          label: "Thêm sân mới",
-        },
-        {
-          key: "/venue/categories",
-          label: "Loại sân",
-        },
-      ],
-    },
-    {
-      key: "user",
+      key: "specialties",
       icon: <UserOutlined />,
-      label: "Quản lý người dùng",
+      label: "Chuyên khoa",
       children: [
         {
-          key: "/user/list",
-          label: "Danh sách người dùng",
-        },
-        {
-          key: "/user/roles",
-          label: "Phân quyền",
+          key: "/specialties",
+          label: "Danh sách chuyên khoa",
         },
       ],
     },
     {
-      key: "payment",
-      icon: <CreditCardOutlined />,
-      label: "Quản lý thanh toán",
+      key: "medicalfacilities",
+      icon: <EnvironmentOutlined />, // Cơ sở y tế: dùng Environment icon
+      label: "Cơ sở y tế",
       children: [
         {
-          key: "/payment/transactions",
-          label: "Giao dịch",
-        },
-        {
-          key: "/payment/methods",
-          label: "Phương thức thanh toán",
-        },
-        {
-          key: "/payment/refunds",
-          label: "Hoàn tiền",
-        },
-      ],
-    },
-    {
-      key: "tournament",
-      icon: <TrophyOutlined />,
-      label: "Giải đấu",
-      children: [
-        {
-          key: "/tournament/list",
-          label: "Danh sách giải đấu",
-        },
-        {
-          key: "/tournament/create",
-          label: "Tạo giải đấu",
-        },
-        {
-          key: "/tournament/teams",
-          label: "Quản lý đội",
+          key: "/facilities",
+          label: "Danh sách cơ sở y tế",
         },
       ],
     },
@@ -136,25 +100,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         {
           key: "/report/user",
           label: "Báo cáo người dùng",
-        },
-      ],
-    },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Cài đặt hệ thống",
-      children: [
-        {
-          key: "/settings/general",
-          label: "Cài đặt chung",
-        },
-        {
-          key: "/settings/notification",
-          label: "Thông báo",
-        },
-        {
-          key: "/settings/backup",
-          label: "Sao lưu dữ liệu",
         },
       ],
     },
@@ -221,9 +166,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       trigger={null}
       collapsible
       collapsed={collapsed}
+      width={250}
+      collapsedWidth={80}
       style={{
         background: "#fff",
         borderRight: "1px solid #f0f0f0",
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div
@@ -240,29 +191,43 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           <div
             style={{ fontSize: "16px", fontWeight: "bold", color: "#1890ff" }}
           >
-            SportHub
+            <img width="60px" src={logo} alt="Logo" />
           </div>
         )}
+
         {collapsed && (
           <div
             style={{ fontSize: "20px", fontWeight: "bold", color: "#1890ff" }}
           >
-            SH
+            <img width="55px" src={logo} alt="Logo" />
           </div>
         )}
       </div>
 
-      <Menu
-        mode="inline"
-        selectedKeys={getSelectedKeys()}
-        defaultOpenKeys={getOpenKeys()}
-        items={menuItems}
-        onClick={handleMenuClick}
+      <div
         style={{
-          border: "none",
-          background: "transparent",
+          flex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          maxHeight: "calc(100vh - 72px)",
+          minHeight: 0,
         }}
-      />
+        className="custom-scrollbar"
+      >
+        <Menu
+          mode="inline"
+          selectedKeys={getSelectedKeys()}
+          defaultOpenKeys={getOpenKeys()}
+          items={menuItems}
+          onClick={handleMenuClick}
+          style={{
+            border: "none",
+            background: "transparent",
+            height: "auto",
+            minHeight: "100%",
+          }}
+        />
+      </div>
     </Sider>
   );
 };

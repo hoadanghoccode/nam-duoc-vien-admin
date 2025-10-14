@@ -9,11 +9,20 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 // Reducers các module
 import authReducer from "./authen/authSlice";
+import specialtyCreateReducer from "./specialty/specialtyCreateSlice";
+import specialtyDeleteReducer from "./specialty/specialtyDeleteSlice";
+import specialtyReducer from "./specialty/specialtySlice";
+import specialtyUpdateReducer from "./specialty/specialtyUpdateSlice";
+import specialtyDetailReducer from "./specialty/specialtyDetailSlice";
 
 // Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
-  // customizer: CustomizerReducer,
+  specialtyCreate: specialtyCreateReducer,
+  specialtyDelete: specialtyDeleteReducer,
+  specialty: specialtyReducer,
+  specialtyUpdate: specialtyUpdateReducer,
+  specialtyDetail: specialtyDetailReducer,
 });
 
 // Chỉ định reducer nào được lưu persist (bạn đổi lại theo mục đích, ví dụ: ['auth', 'customizer'] nếu muốn lưu cả customizer)

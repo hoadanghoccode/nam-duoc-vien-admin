@@ -164,3 +164,153 @@ export interface ContentPageResponse {
   updatedAt: string | null;
   id: string;
 }
+
+/** ===== Types ===== */
+export type CreateMedicalFacilityDto = {
+  facilityName: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  ward?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  imageURL?: string;
+  latitude?: number;
+  longitude?: number;
+  isActive?: boolean;
+  specialtyIds?: string[]; // danh sách Specialty UUID
+};
+
+// (tuỳ BE, thường trả về record vừa tạo)
+export type MedicalFacility = {
+  id: string;
+  facilityName: string;
+  facilityCode: string; // auto-generate từ facilityName
+  address: string;
+  city: string;
+  district: string;
+  ward: string;
+  phone: string;
+  email: string;
+  website: string;
+  description: string;
+  imageURL: string;
+  latitude: number;
+  longitude: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  specialties: Array<{
+    id: string; // id quan hệ
+    specialty: {
+      id: string;
+      specialtyName: string;
+      specialtyCode: string;
+      description: string;
+      imageURL: string;
+      displayOrder: number;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    isActive: boolean;
+  }>;
+};
+
+export type FacilitySpecialty = {
+  id: string; // id quan hệ
+  specialty: {
+    id: string;
+    specialtyName: string;
+    specialtyCode: string;
+    description: string;
+    imageURL: string;
+    displayOrder: number;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+  isActive: boolean;
+};
+
+export type MedicalFacilityPaging = {
+  pageIndex: number;
+  pageSize: number;
+  totalCount: number;
+  orderColumn: string | null;
+  orderDirection: "asc" | "desc" | string | null;
+  items: MedicalFacility[];
+};
+
+export type UpdateMedicalFacilityDto = {
+  facilityName: string;
+  address?: string;
+  city?: string;
+  district?: string;
+  ward?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  imageURL?: string;
+  latitude?: number;
+  longitude?: number;
+  isActive?: boolean;
+  specialties?: { id: string; specialtyId: string }[]; // theo swagger
+};
+
+export const medicalFacilityAdminApi = {
+  createFacility: (payload: CreateMedicalFacilityDto) => {
+    return authorizedAxiosInstance.post<MedicalFacility>(
+      "/admin/medical-facilities",
+      payload
+    );
+  },
+  getFacilities: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    city?: string;
+    district?: string;
+    isActive?: boolean;
+    specialtyId?: string;
+    orderColumn?: string;
+    orderDirection?: "asc" | "desc" | string;
+  }) => {
+    const q = {
+      SearchTerm: params?.search ?? "",
+      City: params?.city ?? "",
+      District: params?.district ?? "",
+      IsActive:
+        typeof params?.isActive === "boolean" ? params?.isActive : undefined,
+      SpecialtyId: params?.specialtyId ?? "",
+      PageIndex: params?.page ?? 1,
+      PageSize: params?.limit ?? 10,
+      OrderColumn: params?.orderColumn ?? "",
+      OrderDirection: params?.orderDirection ?? "",
+    };
+    return authorizedAxiosInstance.get<MedicalFacilityPaging>(
+      "/admin/medical-facilities",
+      { params: q }
+    );
+  },
+  deleteFacility: (id: string) => {
+    // 204 No Content khi thành công
+    return authorizedAxiosInstance.delete<void>(
+      `/admin/medical-facilities/${id}`
+    );
+  },
+  getFacilityById: (id: string) => {
+    return authorizedAxiosInstance.get<MedicalFacility>(
+      `/admin/medical-facilities/${id}`
+    );
+  },
+  updateFacility: (id: string, payload: UpdateMedicalFacilityDto) => {
+    return authorizedAxiosInstance.put(
+      `/admin/medical-facilities/${id}`,
+      payload
+    );
+  },
+};

@@ -15,6 +15,13 @@ import specialtyReducer from "./specialty/specialtySlice";
 import specialtyUpdateReducer from "./specialty/specialtyUpdateSlice";
 import specialtyDetailReducer from "./specialty/specialtyDetailSlice";
 
+// Facility reducers
+import adminMedicalFacilityReducer from "./facilities/adminMedicalFacilitySlice";
+import medicalFacilityCreateReducer from "./facilities/medicalFacilityCreateSlice";
+import adminMedicalFacilityUpdateReducer from "./facilities/adminMedicalFacilityUpdateSlice";
+import adminMedicalFacilityDeleteReducer from "./facilities/adminMedicalFacilityDeleteSlice";
+import adminMedicalFacilityDetailReducer from "./facilities/adminMedicalFacilityDetailSlice";
+
 // Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -23,6 +30,13 @@ const rootReducer = combineReducers({
   specialty: specialtyReducer,
   specialtyUpdate: specialtyUpdateReducer,
   specialtyDetail: specialtyDetailReducer,
+  
+  // Facility reducers
+  adminMedicalFacility: adminMedicalFacilityReducer,
+  medicalFacilityCreate: medicalFacilityCreateReducer,
+  adminMedicalFacilityUpdate: adminMedicalFacilityUpdateReducer,
+  adminMedicalFacilityDelete: adminMedicalFacilityDeleteReducer,
+  adminMedicalFacilityDetail: adminMedicalFacilityDetailReducer,
 });
 
 // Chỉ định reducer nào được lưu persist (bạn đổi lại theo mục đích, ví dụ: ['auth', 'customizer'] nếu muốn lưu cả customizer)

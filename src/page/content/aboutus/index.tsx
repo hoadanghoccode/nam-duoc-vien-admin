@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from "react";
 import { message } from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  contentApi,
+  ContentPageResponse,
+  PAGE_KEY_MAP,
+} from "../../../api/apiEndPoint";
 import TinyMCEEditor from "../../../components/TinyMCEEditor";
-import { contentApi, PAGE_KEY_MAP, ContentPageResponse } from "../../../api/apiEndPoint";
 
 const AboutUsPage: React.FC = () => {
-  const [contentData, setContentData] = useState<ContentPageResponse | null>(null);
+  const [contentData, setContentData] = useState<ContentPageResponse | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -17,8 +23,8 @@ const AboutUsPage: React.FC = () => {
       const response = await contentApi.getContentPage(PAGE_KEY_MAP.ABOUT_US);
       setContentData(response.data);
     } catch (error) {
-      console.error('Lỗi khi tải nội dung:', error);
-      message.error('Không thể tải nội dung trang');
+      console.error("Lỗi khi tải nội dung:", error);
+      message.error("Không thể tải nội dung trang");
     } finally {
       setLoading(false);
     }
@@ -29,40 +35,42 @@ const AboutUsPage: React.FC = () => {
       await contentApi.updateContentPage(PAGE_KEY_MAP.ABOUT_US, {
         pageTitle: title,
         contentHTML: content,
-        isActive: true
+        isActive: true,
       });
-      message.success('Lưu nội dung thành công!');
-      
+      message.success("Lưu nội dung thành công!");
+
       // Cập nhật lại dữ liệu local
       if (contentData) {
         setContentData({
           ...contentData,
           pageTitle: title,
-          contentHTML: content
+          contentHTML: content,
         });
       }
     } catch (error) {
-      console.error('Lỗi khi lưu:', error);
-      message.error('Có lỗi xảy ra khi lưu nội dung');
+      console.error("Lỗi khi lưu:", error);
+      message.error("Có lỗi xảy ra khi lưu nội dung");
       throw error;
     }
   };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px 0' }}>
+      <div style={{ textAlign: "center", padding: "50px 0" }}>
         <div>Đang tải nội dung...</div>
       </div>
     );
   }
 
   return (
-    <TinyMCEEditor
-      pageKey={PAGE_KEY_MAP.ABOUT_US}
-      pageTitle={contentData?.pageTitle || "Giới thiệu website"}
-      initialContent={contentData?.contentHTML || ""}
-      onSave={handleSave}
-    />
+    <>
+      <TinyMCEEditor
+        pageKey={PAGE_KEY_MAP.ABOUT_US}
+        pageTitle={contentData?.pageTitle || "Giới thiệu website"}
+        initialContent={contentData?.contentHTML || ""}
+        onSave={handleSave}
+      />
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ import MainLayout from "../layouts/MainLayout";
 /* Pages */
 const FacilityList = lazy(() => import("../page/facility"));
 const SpecialtyList = lazy(() => import("../page/speciality"));
+const VietmapDemo = lazy(() => import("../page/VietmapDemo"));
 
 // Content Management Pages
 const AboutUsPage = lazy(() => import("../page/content/aboutus"));
@@ -78,6 +79,7 @@ const Router = [
       // { path: "/dashboard", element: <Dashboard /> },
       { path: "/facilities", element: <FacilityList /> },
       { path: "/specialties", element: <SpecialtyList /> },
+      { path: "/vietmap-demo", element: <VietmapDemo /> },
 
       // Content Management Routes
       { path: "/content/about-us", element: <AboutUsPage /> },

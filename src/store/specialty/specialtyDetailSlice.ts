@@ -34,7 +34,7 @@ export const getSpecialtyDetailAsync = createAsyncThunk(
       return res.data as Specialty;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Lấy chi tiết Specialty thất bại!"
+        err?.response?.data?.errorMessage || "Lấy chi tiết Specialty thất bại!"
       );
     }
   }

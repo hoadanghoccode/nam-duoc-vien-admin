@@ -52,7 +52,7 @@ export const getSpecialtiesAsync = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Lấy specialties thất bại!"
+        err?.response?.data?.errorMessage || "Lấy specialties thất bại!"
       );
     }
   }

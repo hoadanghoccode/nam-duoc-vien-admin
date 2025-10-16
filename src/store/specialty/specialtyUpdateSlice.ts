@@ -44,7 +44,7 @@ export const updateSpecialtyAsync = createAsyncThunk(
       return res.data as Specialty;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Cập nhật Specialty thất bại!"
+        err?.response?.data?.errorMessage || "Cập nhật Specialty thất bại!"
       );
     }
   }

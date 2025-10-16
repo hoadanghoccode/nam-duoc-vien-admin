@@ -23,7 +23,7 @@ export const deleteSpecialtyAsync = createAsyncThunk(
       return id;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Xoá Specialty thất bại!"
+        err?.response?.data?.errorMessage || "Xoá Specialty thất bại!"
       );
     }
   }

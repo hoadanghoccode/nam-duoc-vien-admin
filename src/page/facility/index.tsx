@@ -10,6 +10,7 @@ import { deleteAdminMedicalFacilityAsync } from "../../store/facilities/adminMed
 import { getAdminMedicalFacilitiesAsync } from "../../store/facilities/adminMedicalFacilitySlice";
 import { updateAdminMedicalFacilityAsync } from "../../store/facilities/adminMedicalFacilityUpdateSlice";
 import { createMedicalFacilityAsync } from "../../store/facilities/medicalFacilityCreateSlice";
+import { getFullImageUrl } from "../../utils/image-utils";
 import { notifyStatus } from "../../utils/toast-notifier";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { FacilityDetailModal } from "./components/FacilityDetailModal";
@@ -45,6 +46,9 @@ const FacilityManagementPage = () => {
     error: listError,
     data: listData,
   } = useSelector((state: RootState) => state.adminMedicalFacility);
+  const {
+    data: facilityDetail,
+  } = useSelector((state: RootState) => state.adminMedicalFacilityDetail);
 
   // Local states
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -161,7 +165,9 @@ const FacilityManagementPage = () => {
       ).unwrap();
       handleCloseDeleteModal();
     } catch (error) {
-      notifyStatus(500, "Xóa cơ sở y tế không thành công!");
+      // Error notification is handled by useEffect (line 90)
+      console.error("Error deleting facility:", error);
+      handleCloseDeleteModal();
     }
   };
 
@@ -183,7 +189,32 @@ const FacilityManagementPage = () => {
         }
       }
 
-      const payload = {
+      // BƯỚC 2: Xử lý specialties theo logic API
+      // - Có id (của relationship): API sẽ giữ lại/update
+      // - Không có id: API sẽ tạo mới
+      // - Không có trong list: API sẽ tự động xóa
+      const existingSpecialties = facilityDetail?.specialties || [];
+      const specialties = values.specialtyIds.map((specialtyId) => {
+        // Tìm relationship hiện tại có specialtyId này
+        const existing = existingSpecialties.find(
+          (s: any) => s.specialty?.id === specialtyId
+        );
+        
+        if (existing) {
+          // Specialty đã tồn tại → giữ lại id của relationship
+          return {
+            id: existing.id,
+            specialtyId: specialtyId,
+          };
+        } else {
+          // Specialty mới → không có id, API sẽ tạo mới
+          return {
+            specialtyId: specialtyId,
+          };
+        }
+      });
+
+      const payload: any = {
         id: viewingFacilityId,
         facilityName: values.facilityName,
         address: values.address,
@@ -198,7 +229,7 @@ const FacilityManagementPage = () => {
         latitude: values.latitude,
         longitude: values.longitude,
         isActive: values.isActive,
-        specialtyIds: values.specialtyIds,
+        specialties: specialties,
       };
 
       // UPDATE mode (for detail modal)
@@ -233,7 +264,13 @@ const FacilityManagementPage = () => {
         }
       }
 
-      const payload = {
+      // BƯỚC 2: Xử lý specialties
+      // CREATE mode: tất cả specialties đều mới (không có id)
+      const specialties = values.specialtyIds.map((specialtyId) => ({
+        specialtyId: specialtyId,
+      }));
+
+      const payload: any = {
         facilityName: values.facilityName,
         address: values.address,
         city: values.city,
@@ -247,11 +284,11 @@ const FacilityManagementPage = () => {
         latitude: values.latitude,
         longitude: values.longitude,
         isActive: values.isActive,
-        specialtyIds: values.specialtyIds,
+        specialties: specialties,
       };
 
       if (editData) {
-        // UPDATE mode
+        // UPDATE mode (hiếm khi dùng vì đã có FacilityDetailModal)
         await dispatch(
           updateAdminMedicalFacilityAsync({
             id: editData.id || "",
@@ -301,7 +338,7 @@ const FacilityManagementPage = () => {
         width: 100,
         render: (imageURL: string) => (
           <img
-            src={imageURL}
+            src={getFullImageUrl(imageURL)}
             alt="Facility"
             style={{
               width: 50,

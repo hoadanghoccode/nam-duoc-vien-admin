@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/Store";
 import { getAdminMedicalFacilityDetailAsync } from "../../../store/facilities/adminMedicalFacilityDetailSlice";
 import { getSpecialtiesAsync } from "../../../store/specialty/specialtySlice";
+import { getFullImageUrl } from "../../../utils/image-utils";
 import { notifyStatus } from "../../../utils/toast-notifier";
 import "../style/FacilityModal.css";
 
@@ -180,7 +181,7 @@ export const FacilityDetailModal: React.FC<FacilityDetailModalProps> = ({
   // Reset state khi modal đóng/mở
   useEffect(() => {
     if (visible && facilityData) {
-      setImagePreview(facilityData.imageURL);
+      setImagePreview(getFullImageUrl(facilityData.imageURL));
     } else if (!visible) {
       setImagePreview("");
     }
@@ -668,23 +669,27 @@ export const FacilityDetailModal: React.FC<FacilityDetailModalProps> = ({
                   <label className="form-label">
                     Chuyên khoa <span className="required">*</span>
                   </label>
-                  <Field name="specialtyIds">
-                    {({ field }: any) => (
-                      <Select
-                        {...field}
-                        mode="multiple"
-                        placeholder="Chọn các chuyên khoa"
-                        size="large"
-                        disabled={mode === "view"}
-                        status={
-                          touched.specialtyIds && errors.specialtyIds
-                            ? "error"
-                            : ""
-                        }
-                        options={specialtyOptions}
-                      />
-                    )}
-                  </Field>
+                  <Select
+                    mode="multiple"
+                    size="large"
+                    placeholder="Chọn các chuyên khoa"
+                    value={values.specialtyIds}
+                    onChange={(value) => setFieldValue("specialtyIds", value)}
+                    options={specialtyOptions}
+                    style={{ width: "100%" }}
+                    disabled={mode === "view"}
+                    status={
+                      touched.specialtyIds && errors.specialtyIds
+                        ? "error"
+                        : ""
+                    }
+                    showSearch
+                    filterOption={(input, option) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                  />
                   <ErrorMessage
                     name="specialtyIds"
                     component="div"

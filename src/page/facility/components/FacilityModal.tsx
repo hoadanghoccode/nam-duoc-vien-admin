@@ -7,6 +7,7 @@ import { VietmapSearch } from "../../../helpers/VietmapSearch";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/Store";
 import { getSpecialtiesAsync } from "../../../store/specialty/specialtySlice";
+import { getFullImageUrl } from "../../../utils/image-utils";
 import "../style/FacilityModal.css";
 
 const { TextArea } = Input;
@@ -157,7 +158,7 @@ export const FacilityModal: React.FC<FacilityModalProps> = ({
   // Reset state khi modal đóng/mở
   useEffect(() => {
     if (visible && initialValues) {
-      setImagePreview(initialValues.imageURL);
+      setImagePreview(getFullImageUrl(initialValues.imageURL));
     } else if (!visible) {
       setImagePreview("");
     }

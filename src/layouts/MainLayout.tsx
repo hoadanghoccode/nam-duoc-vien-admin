@@ -10,9 +10,9 @@ const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Layout style={{ minHeight: "100vh", overflow: "hidden" }}>
+    <Layout style={{ minHeight: "100vh" }}>
       <Sidebar collapsed={collapsed} />
-      <Layout style={{ overflow: "hidden" }}>
+      <Layout style={{ marginLeft: collapsed ? 80 : 250, transition: "margin-left 0.2s" }}>
         <Header
           collapsed={collapsed}
           onToggle={() => setCollapsed(!collapsed)}
@@ -24,7 +24,7 @@ const MainLayout: React.FC = () => {
             minHeight: "calc(100vh - 112px)",
             background: "#f5f5f5",
             borderRadius: 8,
-            overflow: "auto",
+            overflow: "visible",
           }}
         >
           <div

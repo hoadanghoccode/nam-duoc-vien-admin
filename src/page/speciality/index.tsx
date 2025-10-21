@@ -1,21 +1,23 @@
 // SpecialtyPage.tsx
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { SpecialtyFormSubmit } from "./components/SpecialtyModal";
-import { Button, Table, Space, Tag, Typography, Tooltip } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import SpecialtyModal from "./components/SpecialtyModal";
-import SpecialtyDetailModal from "./components/SpecialtyDetailModal";
-import DeleteConfirmModal from "./components/DeleteConfirmModal";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../store/Store";
-import { createSpecialtyAsync } from "../../store/specialty/specialtyCreateSlice";
-import { updateSpecialtyAsync } from "../../store/specialty/specialtyUpdateSlice";
-import { deleteSpecialtyAsync } from "../../store/specialty/specialtyDeleteSlice";
-import { getSpecialtiesAsync } from "../../store/specialty/specialtySlice";
-import { uploadImageToCloud } from "../../helpers/upload";
-import { notifyStatus } from "../../utils/toast-notifier";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag, Tooltip, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadImageToCloud } from "../../helpers/upload";
+import { AppDispatch, RootState } from "../../store/Store";
+import { createSpecialtyAsync } from "../../store/specialty/specialtyCreateSlice";
+import { deleteSpecialtyAsync } from "../../store/specialty/specialtyDeleteSlice";
+import { getSpecialtiesAsync } from "../../store/specialty/specialtySlice";
+import { updateSpecialtyAsync } from "../../store/specialty/specialtyUpdateSlice";
+import { getFullImageUrl } from "../../utils/image-utils";
+import { notifyStatus } from "../../utils/toast-notifier";
+import DeleteConfirmModal from "./components/DeleteConfirmModal";
+import SpecialtyDetailModal from "./components/SpecialtyDetailModal";
+import SpecialtyModal, {
+  SpecialtyFormSubmit,
+} from "./components/SpecialtyModal";
 
 const { Title, Text } = Typography;
 
@@ -195,8 +197,9 @@ const SpecialtyPage = () => {
       await dispatch(deleteSpecialtyAsync(deletingSpecialty.id)).unwrap();
       handleCloseDeleteModal(); // Đóng modal sau khi xóa thành công
     } catch (error) {
-      notifyStatus(200, "Xóa chuyên khoa không thành công!");
-      // console.error("Error deleting specialty:", );
+      // Error notification is handled by useEffect (line 87)
+      console.error("Error deleting specialty:", error);
+      handleCloseDeleteModal(); // Đóng modal ngay cả khi xóa thất bại
     }
   };
 
@@ -267,7 +270,7 @@ const SpecialtyPage = () => {
         width: 100,
         render: (imageURL: string) => (
           <img
-            src={imageURL}
+            src={getFullImageUrl(imageURL)}
             alt="Specialty"
             style={{
               width: 50,

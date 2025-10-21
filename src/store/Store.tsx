@@ -21,6 +21,29 @@ import medicalFacilityCreateReducer from "./facilities/medicalFacilityCreateSlic
 import adminMedicalFacilityUpdateReducer from "./facilities/adminMedicalFacilityUpdateSlice";
 import adminMedicalFacilityDeleteReducer from "./facilities/adminMedicalFacilityDeleteSlice";
 import adminMedicalFacilityDetailReducer from "./facilities/adminMedicalFacilityDetailSlice";
+import adminSpecialtiesByFacilityReducer from "./facilities/adminSpecialtiesByFacilitySlice";
+
+// Doctor reducers
+import adminDoctorsReducer from "./doctor/adminDoctorsSlice";
+import adminDoctorCreateReducer from "./doctor/adminDoctorCreateSlice";
+import adminDoctorUpdateReducer from "./doctor/adminDoctorUpdateSlice";
+import adminDoctorDeleteReducer from "./doctor/adminDoctorDeleteSlice";
+import adminDoctorDetailReducer from "./doctor/adminDoctorDetailSlice";
+import adminTimeSlotReducer from "./doctor/adminTimeSlotSlice";
+
+// Dashboard reducers
+import adminRevenueOverviewReducer from "./dashboard/adminRevenueOverviewSlice";
+import adminRevenueByPeriodReducer from "./dashboard/adminRevenueByPeriodSlice";
+import adminTopDoctorsReducer from "./dashboard/adminTopDoctorsSlice";
+import adminRevenueStatisticsReducer from "./dashboard/adminRevenueStatisticsSlice";
+import revenueByDoctorReducer from "./dashboard/revenueByDoctorSlice";
+
+// Appointment reducers
+import adminAppointmentsReducer from "./appointments/adminAppointmentsSlice";
+import adminAppointmentDetailReducer from "./appointments/adminAppointmentDetailSlice";
+import adminConfirmAppointmentReducer from "./appointments/adminConfirmAppointmentSlice";
+import adminCompleteAppointmentReducer from "./appointments/adminCompleteAppointmentSlice";
+import adminCancelAppointmentReducer from "./appointments/adminCancelAppointmentSlice";
 
 // Combine reducers
 const rootReducer = combineReducers({
@@ -37,6 +60,29 @@ const rootReducer = combineReducers({
   adminMedicalFacilityUpdate: adminMedicalFacilityUpdateReducer,
   adminMedicalFacilityDelete: adminMedicalFacilityDeleteReducer,
   adminMedicalFacilityDetail: adminMedicalFacilityDetailReducer,
+  adminSpecialtiesByFacility: adminSpecialtiesByFacilityReducer,
+  
+  // Doctor reducers
+  adminDoctors: adminDoctorsReducer,
+  adminDoctorCreate: adminDoctorCreateReducer,
+  adminDoctorUpdate: adminDoctorUpdateReducer,
+  adminDoctorDelete: adminDoctorDeleteReducer,
+  adminDoctorDetail: adminDoctorDetailReducer,
+  adminTimeSlot: adminTimeSlotReducer,
+  
+  // Dashboard reducers
+  adminRevenueOverview: adminRevenueOverviewReducer,
+  adminRevenueByPeriod: adminRevenueByPeriodReducer,
+  adminTopDoctors: adminTopDoctorsReducer,
+  adminRevenueStatistics: adminRevenueStatisticsReducer,
+  revenueByDoctor: revenueByDoctorReducer,
+  
+  // Appointment reducers
+  adminAppointments: adminAppointmentsReducer,
+  adminAppointmentDetail: adminAppointmentDetailReducer,
+  adminConfirmAppointment: adminConfirmAppointmentReducer,
+  adminCompleteAppointment: adminCompleteAppointmentReducer,
+  adminCancelAppointment: adminCancelAppointmentReducer,
 });
 
 // Chỉ định reducer nào được lưu persist (bạn đổi lại theo mục đích, ví dụ: ['auth', 'customizer'] nếu muốn lưu cả customizer)

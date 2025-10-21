@@ -5,7 +5,7 @@ import {
   CloseCircleFilled,
   EnvironmentOutlined,
 } from "@ant-design/icons";
-import "./VietmapSearch.css";
+import "././style/VietmapSearch.css";
 
 interface Suggestion {
   display?: string;
@@ -29,11 +29,18 @@ interface PlaceDetail {
 }
 
 interface VietmapSearchProps {
-  onLocationSelect?: (location: { address: string; lat: number; lng: number }) => void;
+  onLocationSelect?: (location: {
+    address: string;
+    lat: number;
+    lng: number;
+  }) => void;
   initialLocation?: { lat: number; lng: number; address?: string };
 }
 
-export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSearchProps = {}) {
+export function VietmapSearch({
+  onLocationSelect,
+  initialLocation,
+}: VietmapSearchProps = {}) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const marker = useRef<any>(null);
@@ -54,7 +61,7 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
       // Gọi API reverse geocoding qua backend
       const url = `/api/vietmap/reverse?lat=${lat}&lng=${lng}`;
       const res = await fetch(url);
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.address) {
@@ -127,14 +134,14 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
       if (mapContainer.current && !map.current && vietmapgl.current) {
         try {
           // Sử dụng tọa độ ban đầu nếu có, không thì dùng Hà Nội
-          const center = initialLocation 
+          const center = initialLocation
             ? [initialLocation.lng, initialLocation.lat]
             : [105.8342, 21.0376];
           const zoom = initialLocation ? 16 : 13;
 
           map.current = new vietmapgl.current.Map({
             container: mapContainer.current,
-            style: `https://nam-hoai-api.xyz/vm/style.json`,
+            style: `https://namduocvien-api.id.vn/vm/style.json`,
             center: center,
             zoom: zoom,
           });
@@ -148,7 +155,11 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
           if (initialLocation) {
             // Tìm địa chỉ từ tọa độ (reverse geocoding)
             reverseGeocode(initialLocation.lat, initialLocation.lng);
-            showMarker(initialLocation.lng, initialLocation.lat, initialLocation.address || "Vị trí đã chọn");
+            showMarker(
+              initialLocation.lng,
+              initialLocation.lat,
+              initialLocation.address || "Vị trí đã chọn"
+            );
           }
           console.log("Map initialized successfully");
         } catch (error) {
@@ -228,7 +239,7 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
       return placeCache.current.get(refid)!;
     }
 
-    const url = `https://nam-hoai-api.xyz/vietmap/api/place?refid=${encodeURIComponent(
+    const url = `https://namduocvien-api.id.vn/vietmap/api/place?refid=${encodeURIComponent(
       refid
     )}`;
     const res = await fetch(url);
@@ -254,7 +265,7 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
 
     try {
       const { lat, lng } = map.current.getCenter();
-      const url = `https://nam-hoai-api.xyz/vietmap/api/autocomplete?text=${encodeURIComponent(
+      const url = `https://namduocvien-api.id.vn/vietmap/api/autocomplete?text=${encodeURIComponent(
         text
       )}&focus=${lat},${lng}&display_type=1`;
 
@@ -303,7 +314,7 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
 
     if (typeof candLat === "number" && typeof candLng === "number") {
       showMarker(candLng, candLat, displayText);
-      
+
       // Gọi callback nếu có
       if (onLocationSelect) {
         onLocationSelect({
@@ -330,7 +341,7 @@ export function VietmapSearch({ onLocationSelect, initialLocation }: VietmapSear
       ) {
         const label = place.display || place.name || displayText;
         showMarker(place.lng, place.lat, label);
-        
+
         // Gọi callback nếu có
         if (onLocationSelect) {
           onLocationSelect({

@@ -18,6 +18,11 @@ const FAQPage = lazy(() => import("../page/content/faq"));
 const UserGuidePage = lazy(() => import("../page/content/userguide"));
 
 const Login = lazy(() => import("../page/authen/components/loginPage"));
+const Doctor = lazy(() => import("../page/doctor"));
+const Dashboard = lazy(() => import("../page/dashboard"));
+const Appointment = lazy(() => import("../page/appointment"));
+const RevenueReport = lazy(() => import("../page/revenue-report"));
+const TopDoctors = lazy(() => import("../page/top-doctors"));
 
 /* ===== Token helpers ===== */
 const getToken = () => localStorage.getItem("accessToken") || "";
@@ -76,10 +81,14 @@ const Router = [
     ),
     children: [
       { path: "/", element: <Navigate to="/dashboard" replace /> },
-      // { path: "/dashboard", element: <Dashboard /> },
-      { path: "/facilities", element: <FacilityList /> },
-      { path: "/specialties", element: <SpecialtyList /> },
-      { path: "/vietmap-demo", element: <VietmapDemo /> },
+              { path: "/dashboard", element: <Dashboard /> },
+              { path: "/facilities", element: <FacilityList /> },
+              { path: "/specialties", element: <SpecialtyList /> },
+              { path: "/vietmap-demo", element: <VietmapDemo /> },
+              { path: "/doctor", element: <Doctor /> },
+              { path: "/appointments", element: <Appointment /> },
+              { path: "/revenue-report", element: <RevenueReport /> },
+              { path: "/top-doctors", element: <TopDoctors /> },
 
       // Content Management Routes
       { path: "/content/about-us", element: <AboutUsPage /> },

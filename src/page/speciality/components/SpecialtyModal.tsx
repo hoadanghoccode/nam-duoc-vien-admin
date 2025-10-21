@@ -2,6 +2,7 @@
 import { Form, Input, InputNumber, Modal, Switch, message, Upload } from "antd";
 import { UploadOutlined, CloseCircleFilled } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
+import { getFullImageUrl } from "../../../utils/image-utils";
 
 // Interface cho dữ liệu specialty
 export interface SpecialtyFormData {
@@ -42,7 +43,7 @@ const SpecialtyModal: React.FC<SpecialtyModalProps> = ({
   useEffect(() => {
     if (visible && initialValues) {
       form.setFieldsValue(initialValues);
-      setImageUrl(initialValues.imageURL);
+      setImageUrl(getFullImageUrl(initialValues.imageURL));
     } else if (visible) {
       form.resetFields();
       setImageUrl("");

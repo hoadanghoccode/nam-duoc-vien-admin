@@ -1,19 +1,19 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Button, Table, Space, Tag, Typography, Tooltip } from "antd";
-import { PlusOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
-import { FacilityModal, FacilityFormData } from "./components/FacilityModal";
-import { FacilityDetailModal } from "./components/FacilityDetailModal";
-import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../store/Store";
-import { createMedicalFacilityAsync } from "../../store/facilities/medicalFacilityCreateSlice";
-import { updateAdminMedicalFacilityAsync } from "../../store/facilities/adminMedicalFacilityUpdateSlice";
-import { deleteAdminMedicalFacilityAsync } from "../../store/facilities/adminMedicalFacilityDeleteSlice";
-import { getAdminMedicalFacilitiesAsync } from "../../store/facilities/adminMedicalFacilitySlice";
-import { uploadImageToCloud } from "../../helpers/upload";
-import { notifyStatus } from "../../utils/toast-notifier";
+import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag, Tooltip, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadImageToCloud } from "../../helpers/upload";
+import { AppDispatch, RootState } from "../../store/Store";
+import { deleteAdminMedicalFacilityAsync } from "../../store/facilities/adminMedicalFacilityDeleteSlice";
+import { getAdminMedicalFacilitiesAsync } from "../../store/facilities/adminMedicalFacilitySlice";
+import { updateAdminMedicalFacilityAsync } from "../../store/facilities/adminMedicalFacilityUpdateSlice";
+import { createMedicalFacilityAsync } from "../../store/facilities/medicalFacilityCreateSlice";
+import { notifyStatus } from "../../utils/toast-notifier";
+import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
+import { FacilityDetailModal } from "./components/FacilityDetailModal";
+import { FacilityFormData, FacilityModal } from "./components/FacilityModal";
 
 const { Title, Text } = Typography;
 
@@ -496,6 +496,11 @@ const FacilityManagementPage = () => {
           size="middle"
         />
       </div>
+
+      {/* <VietmapDirections
+        initialStart={{ lat: 21.028511, lng: 105.804817, address: "Hà Nội" }}
+        onRouteReady={(info) => console.log("Route:", info)}
+      /> */}
 
       {/* Create Modal */}
       <FacilityModal

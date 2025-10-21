@@ -24,12 +24,10 @@ export const uploadImageToCloud = async (file: any) => {
       throw new Error("Không nhận được fileUrl từ server");
     }
 
-    // Ghép với base URL để tạo đường dẫn đầy đủ
-    const fullImageUrl = `https://nam-hoai-api.xyz/api/static-contents/${fileUrl}`;
+    console.log("Uploaded fileUrl:", fileUrl);
 
-    console.log("fullImageUrl", fullImageUrl);
-
-    return fullImageUrl;
+    // Trả về fileUrl gốc từ server (không ghép domain)
+    return fileUrl;
   } catch (error) {
     console.error("Lỗi khi upload ảnh:", error);
     throw error;
@@ -55,15 +53,27 @@ export const uploadMultipleImages = async (files: any[]) => {
       }
     );
 
-    // Map tất cả fileUrl thành full URL
-    const fullUrls = response.data.map(
-      (item: any) =>
-        `https://nam-hoai-api.xyz/api/static-contents/${item.fileUrl}`
-    );
+    // Trả về array các fileUrl gốc từ server (không ghép domain)
+    const fileUrls = response.data.map((item: any) => item.fileUrl);
 
-    return fullUrls;
+    console.log("Uploaded fileUrls:", fileUrls);
+
+    return fileUrls;
   } catch (error) {
     console.error("Lỗi khi upload nhiều ảnh:", error);
     throw error;
   }
+};
+
+// Helper function để tạo full URL khi hiển thị
+export const getFullImageUrl = (fileUrl: string) => {
+  if (!fileUrl) return "";
+
+  // Nếu đã có domain rồi thì return luôn
+  if (fileUrl.startsWith("http")) {
+    return fileUrl;
+  }
+
+  // Ghép với base URL để tạo đường dẫn đầy đủ
+  return `https://namduocvien-api.id.vn/api/static-contents/${fileUrl}`;
 };

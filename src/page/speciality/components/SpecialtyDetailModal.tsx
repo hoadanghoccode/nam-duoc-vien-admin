@@ -22,6 +22,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
+import { getFullImageUrl } from "../../../utils/image-utils";
 
 // Interface cho dữ liệu specialty
 export interface SpecialtyFormData {
@@ -68,7 +69,7 @@ const SpecialtyDetailModal: React.FC<SpecialtyDetailModalProps> = ({
   useEffect(() => {
     if (visible && specialtyData) {
       form.setFieldsValue(specialtyData);
-      setImageUrl(specialtyData.imageURL);
+      setImageUrl(getFullImageUrl(specialtyData.imageURL));
       setSelectedFile(null); // Reset file selection
     } else if (visible) {
       form.resetFields();
@@ -203,7 +204,7 @@ const SpecialtyDetailModal: React.FC<SpecialtyDetailModalProps> = ({
             <Col span={24}>
               <div style={{ textAlign: "center", marginBottom: 24 }}>
                 <img
-                  src={specialtyData.imageURL}
+                  src={getFullImageUrl(specialtyData.imageURL)}
                   alt={specialtyData.specialtyName}
                   style={{
                     width: 200,

@@ -1,8 +1,12 @@
 import {
+  CalendarOutlined,
   DashboardOutlined,
   EnvironmentOutlined,
   FileTextOutlined,
+  MedicineBoxOutlined,
   UserOutlined,
+  BarChartOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
@@ -25,6 +29,16 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       key: "/dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
+    },
+    {
+      key: "/revenue-report",
+      icon: <BarChartOutlined />,
+      label: "Báo cáo doanh thu",
+    },
+    {
+      key: "/top-doctors",
+      icon: <TrophyOutlined />,
+      label: "Top bác sĩ",
     },
     {
       key: "content",
@@ -61,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         },
       ],
     },
-
     {
       key: "specialties",
       icon: <UserOutlined />,
@@ -70,6 +83,28 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         {
           key: "/specialties",
           label: "Danh sách chuyên khoa",
+        },
+      ],
+    },
+    {
+      key: "doctors",
+      icon: <MedicineBoxOutlined />,
+      label: "Bác sĩ",
+      children: [
+        {
+          key: "/doctor",
+          label: "Danh sách bác sĩ",
+        },
+      ],
+    },
+    {
+      key: "appointments",
+      icon: <CalendarOutlined />,
+      label: "Cuộc hẹn",
+      children: [
+        {
+          key: "/appointments",
+          label: "Quản lý cuộc hẹn",
         },
       ],
     },
@@ -171,10 +206,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       style={{
         background: "#fff",
         borderRight: "1px solid #f0f0f0",
+        position: "fixed",
+        top: 0,
+        left: 0,
         height: "100vh",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        zIndex: 1000,
       }}
     >
       <div
@@ -191,7 +230,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           <div
             style={{ fontSize: "16px", fontWeight: "bold", color: "#1890ff" }}
           >
-            <img width="60px" src={logo} alt="Logo" />
+            <img width="80px" src={logo} alt="Logo" />
           </div>
         )}
 

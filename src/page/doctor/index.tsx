@@ -9,7 +9,7 @@ import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { uploadImageToCloud } from "../../helpers/upload";
+import { getFullImageUrl, uploadImageToCloud } from "../../helpers/upload";
 import { AppDispatch, RootState } from "../../store/Store";
 import { createAdminDoctorAsync } from "../../store/doctor/adminDoctorCreateSlice";
 import { deleteAdminDoctorAsync } from "../../store/doctor/adminDoctorDeleteSlice";
@@ -355,7 +355,7 @@ const DoctorManagementPage: React.FC = () => {
       width: 100,
       render: (imageURL: string) => (
         <img
-          src={imageURL}
+          src={getFullImageUrl(imageURL)}
           alt="Doctor"
           style={{
             width: 50,

@@ -415,7 +415,7 @@ export function VietmapSearch({
             fontWeight: "600",
           }}
         >
-          Vietmap Search Demo
+          Vietmap Search
         </h2>
       </div>
 

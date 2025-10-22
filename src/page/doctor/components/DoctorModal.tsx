@@ -541,9 +541,13 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
               <Form.Item
                 name="doctorTitle"
                 label="Chức danh"
-                rules={[{ required: true, message: "Vui lòng nhập chức danh" }]}
+                rules={[{ required: true, message: "Vui lòng chọn chức danh" }]}
               >
-                <Input placeholder="Nhập chức danh" />
+                <Select placeholder="Chọn chức danh">
+                  <Select.Option value="Bác sĩ">Bác sĩ</Select.Option>
+                  <Select.Option value="Tiến sĩ">Tiến sĩ</Select.Option>
+                  <Select.Option value="Thạc sĩ">Thạc sĩ</Select.Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>

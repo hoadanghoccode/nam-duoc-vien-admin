@@ -1,6 +1,6 @@
 // src/routes/index.tsx
 import { lazy, PropsWithChildren } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 
 /* Pages */
@@ -44,13 +44,13 @@ const isJwtValid = (token: string) => {
 const isAuthenticated = () => isJwtValid(getToken());
 
 /* ===== Guards (wrappers) ===== */
-function RequireAuth({ children }: PropsWithChildren) {
-  const location = useLocation();
-  if (!isAuthenticated()) {
-    return <Navigate to="/auth/login" replace state={{ from: location }} />;
-  }
-  return <>{children}</>;
-}
+// function RequireAuth({ children }: PropsWithChildren) {
+//   const location = useLocation();
+//   if (!isAuthenticated()) {
+//     return <Navigate to="/auth/login" replace state={{ from: location }} />;
+//   }
+//   return <>{children}</>;
+// }
 
 function OnlyGuests({ children }: PropsWithChildren) {
   if (isAuthenticated()) {
@@ -75,9 +75,9 @@ const Router = [
   {
     path: "/",
     element: (
-      <RequireAuth>
-        <MainLayout />
-      </RequireAuth>
+      // <RequireAuth>
+      <MainLayout />
+      // </RequireAuth>
     ),
     children: [
       { path: "/", element: <Navigate to="/dashboard" replace /> },

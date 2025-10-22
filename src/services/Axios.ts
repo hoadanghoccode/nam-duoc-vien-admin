@@ -7,13 +7,13 @@ import store from "../store/Store";
 const BASE_URL = import.meta.env.VITE_BASE_URL as string;
 console.log("VITE_BASE_URL", import.meta.env.VITE_BASE_URL);
 
-// Những endpoint KHÔNG nên chạm refresh/redirect (auth flow)
+// Những endpoint KHÔNG nên gắn bearer / không tự refresh (auth flow)
 const AUTH_BYPASS_PATHS = [
   "/Authentication/Login",
   "/Authentication/register",
   "/Authentication/RequestForgotPassword",
   "/Authentication/ConfirmForgotPassword",
-  "/Authentication/RefreshToken",
+  "/Authentication/RefreshToken", // <- quan trọng
 ];
 
 // Instance chính dùng cho mọi API (có interceptors)
@@ -24,8 +24,7 @@ const authorizedAxiosInstance = axios.create({
     accept: "*/*",
   },
   withCredentials: true,
-  // 10 minutes (bạn set 10000 * 60 * 10 = 100 phút ở file trước; mình giữ 10 phút)
-  timeout: 60 * 10 * 1000,
+  timeout: 60 * 10 * 1000, // 10 phút
 });
 
 // Instance “trần” để gọi refresh token, tránh bị interceptors chồng lặp
@@ -42,12 +41,10 @@ authorizedAxiosInstance.interceptors.request.use(
     const accessToken =
       state.auth?.accessToken || localStorage.getItem("accessToken");
 
-    // Nếu là các path auth bypass thì không gắn bearer
     const url = config.url || "";
     const shouldBypass = AUTH_BYPASS_PATHS.some((p) => url.includes(p));
 
     if (accessToken && !shouldBypass) {
-      // đảm bảo headers tồn tại
       if (!config.headers)
         config.headers = {} as import("axios").AxiosRequestHeaders;
       (config.headers as any).Authorization = `Bearer ${accessToken}`;
@@ -61,49 +58,67 @@ authorizedAxiosInstance.interceptors.request.use(
 // ==== Refresh Token Queue (chống đua) ====
 let refreshTokenPromise: Promise<string> | null = null;
 
+/**
+ * Gọi refresh token đúng như Swagger:
+ * POST /Authentication/RefreshToken?Token=...&RefreshToken=...
+ * - Không gửi body
+ * - Không gửi Authorization header
+ * - Đọc token mới từ data.content.token
+ */
 const doRefreshToken = async (): Promise<string> => {
-  // Nếu đã có promise refresh đang chạy -> dùng lại
   if (refreshTokenPromise) return refreshTokenPromise;
 
   const refreshToken = localStorage.getItem("refreshToken");
   const currentAccess =
     store.getState().auth?.accessToken || localStorage.getItem("accessToken");
 
-  if (!refreshToken) {
-    // Không có refreshToken => không thể refresh
-    throw new Error("NO_REFRESH_TOKEN");
-  }
+  if (!refreshToken) throw new Error("NO_REFRESH_TOKEN");
 
   refreshTokenPromise = plainAxios
-    .post("/Authentication/RefreshToken", {
-      refreshToken,
-      token: currentAccess,
-    })
+    .post(
+      "/Authentication/RefreshToken",
+      null, // <- KHÔNG gửi body
+      {
+        // <- Gửi qua query string (đúng như Swagger)
+        params: {
+          Token: currentAccess, // tên param phải đúng hoa/thường
+          RefreshToken: refreshToken,
+        },
+        // <- Đảm bảo không có Bearer kèm theo
+        headers: { Authorization: "" },
+      }
+    )
     .then((res) => {
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        res.data || {};
+      /**
+       * Backend trả về:
+       * {
+       *   content: { token: "...", refreshToken: "..." },
+       *   statusCode: 200, ...
+       * }
+       */
+      const content = res?.data?.content ?? {};
+      const newAccessToken: string | undefined = content.token;
+      const newRefreshToken: string | undefined = content.refreshToken;
 
       if (!newAccessToken) throw new Error("INVALID_REFRESH_RESPONSE");
 
       // Lưu lại token mới
       store.dispatch(setAccessToken(newAccessToken));
       localStorage.setItem("accessToken", newAccessToken);
-      if (newRefreshToken)
-        localStorage.setItem("refreshToken", newRefreshToken);
+      if (newRefreshToken) localStorage.setItem("refreshToken", newRefreshToken);
 
-      // cập nhật header mặc định cho instance
+      // Cập nhật header mặc định cho instance
       authorizedAxiosInstance.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-      return newAccessToken as string;
+      return newAccessToken;
     })
     .finally(() => {
-      // reset để lần sau có thể refresh tiếp
       refreshTokenPromise = null;
     });
 
   return refreshTokenPromise;
 };
 
-// response interceptor
+// ==== Response Interceptor ====
 const isAuthBypass = (url = "") =>
   AUTH_BYPASS_PATHS.some((p) => url.includes(p));
 
@@ -115,21 +130,16 @@ authorizedAxiosInstance.interceptors.response.use(
     const url = (originalRequest?.url as string) || "";
     const data = error?.response?.data as any;
 
-    // Chỉ coi là "token hết hạn" khi 401 + errorType phù hợp
+    // Xác định 401 do access token hết hạn
     const isAccessExpired401 =
       status === 401 &&
       (data?.errorType === "ACCESS_TOKEN_EXPIRED" ||
-        // fallback phòng khi BE đổi message
-        String(data?.errorMessage || "")
-          .toLowerCase()
-          .includes("expired"));
-
-    console.log("isAccessExpired401", isAccessExpired401, url, data);
+        String(data?.errorMessage || "").toLowerCase().includes("expired"));
 
     const bypass = isAuthBypass(url);
     const isRefreshEndpoint = url.includes("/Authentication/RefreshToken");
 
-    // ===== 401 do access token hết hạn => thử refresh (không ở auth path, không phải refresh endpoint, chưa retry) =====
+    // 401 do hết hạn token -> refresh (không ở auth path, không phải refresh endpoint, chưa retry)
     if (
       isAccessExpired401 &&
       !bypass &&
@@ -143,25 +153,15 @@ authorizedAxiosInstance.interceptors.response.use(
         (originalRequest.headers as any).Authorization = `Bearer ${newAccess}`;
         return authorizedAxiosInstance(originalRequest);
       } catch (e) {
-        // Refresh fail -> tùy dự án: logout/redirect
-        // await handleLogout();
         return Promise.reject(e);
       }
     }
 
-    // ===== 401 nhưng KHÔNG phải do hết hạn (ví dụ: sai cred ở login, hoặc refresh token hỏng) =====
-    // -> không refresh, trả lỗi
-    if (status === 401) {
-      return Promise.reject(error);
-    }
-
-    // ===== 403: không đủ quyền =====
+    // 401 nhưng không phải hết hạn -> trả lỗi
+    if (status === 401) return Promise.reject(error);
     if (status === 403) return Promise.reject(error);
-
-    // ===== 500+ =====
     if ((status ?? 0) >= 500) return Promise.reject(error);
 
-    // Các lỗi khác giữ nguyên
     return Promise.reject(error);
   }
 );

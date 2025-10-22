@@ -112,6 +112,41 @@ export interface ResetUserPasswordResponse {
   message?: string;
 }
 
+export type UserProfile = {
+  id: string;
+  userName: string;
+  email: string;
+  displayName: string;
+  phoneNumber: string;
+  title: string | null;
+  status: string;
+  isActive: boolean;
+  dateOfBirth: string | null;
+  gender: number | null; // 1 = Male, 2 = Female, 3 = Other
+  address: string | null;
+  imageUrl: string | null;
+  isEmailVerified: boolean;
+  facilityId: string | null;
+  facilityName: string | null;
+  doctorTitle: string | null;
+  bio: string | null;
+  examinationFee: number | null;
+  yearsOfExperience: number | null;
+  licenseNumber: string | null;
+  roles?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+  }>;
+  userHistories?: Array<{
+    action: string;
+    environment: string;
+    ipConnected: string;
+    deviceName: string;
+  }>;
+};
+
 // ========== API ==========
 export const adminUsersApi = {
   // Get list with pagination
@@ -154,7 +189,12 @@ export const adminUsersApi = {
   resetPassword: (data: ResetPasswordRequest) => {
     return authorizedAxiosInstance.post<ResetUserPasswordResponse>(
       `/admin/users/reset-password`,
-      data.newPassword ? { newPassword: data.newPassword } : {}
+      {
+        userId: data.userId,
+      }
     );
+  },
+  getMyProfile: () => {
+    return authorizedAxiosInstance.get<UserProfile>("/public/users/me");
   },
 };

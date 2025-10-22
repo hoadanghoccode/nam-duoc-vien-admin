@@ -1,8 +1,7 @@
 import {
-    CalendarOutlined,
-    DollarOutlined,
-    RiseOutlined,
-    UserOutlined,
+  CalendarOutlined,
+  DollarOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { Card, Col, Row, Statistic, Typography } from "antd";
 import React, { useEffect } from "react";
@@ -10,7 +9,6 @@ import { useSelector } from "react-redux";
 import { dispatch, RootState } from "../../store/Store";
 import { fetchRevenueByPeriod } from "../../store/dashboard/adminRevenueByPeriodSlice";
 import { fetchAdminRevenueOverviewAsync } from "../../store/dashboard/adminRevenueOverviewSlice";
-import DashboardTabs from "./components/DashboardTabs";
 import RevenueOverviewCard from "./components/RevenueOverviewCard";
 
 const { Title } = Typography;
@@ -34,13 +32,7 @@ const Dashboard: React.FC = () => {
     0;
   const averageRevenue =
     revenueData?.length > 0 ? totalRevenue / revenueData.length : 0;
-  const revenueGrowth =
-    revenueData && revenueData.length > 1
-      ? ((revenueData[revenueData.length - 1].totalRevenue -
-          revenueData[revenueData.length - 2].totalRevenue) /
-          revenueData[revenueData.length - 2].totalRevenue) *
-        100
-      : 0;
+ 
 
   return (
     <div style={{ padding: "24px" }}>
@@ -54,7 +46,7 @@ const Dashboard: React.FC = () => {
         gutter={[16, 16]}
         style={{ marginTop: "24px", marginBottom: "24px" }}
       >
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
               title="Tổng doanh thu"
@@ -65,7 +57,7 @@ const Dashboard: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
               title="Tổng số ca khám"
@@ -75,7 +67,7 @@ const Dashboard: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
               title="Doanh thu trung bình"
@@ -86,22 +78,7 @@ const Dashboard: React.FC = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Tăng trưởng"
-              value={revenueGrowth}
-              precision={2}
-              prefix={<RiseOutlined />}
-              suffix="%"
-              valueStyle={{ color: revenueGrowth >= 0 ? "#3f8600" : "#cf1322" }}
-            />
-          </Card>
-        </Col>
       </Row>
-
-      {/* Dashboard Tabs */}
-      <DashboardTabs />
     </div>
   );
 };

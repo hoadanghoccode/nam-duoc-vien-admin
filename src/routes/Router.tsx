@@ -18,12 +18,18 @@ const FAQPage = lazy(() => import("../page/content/faq"));
 const UserGuidePage = lazy(() => import("../page/content/userguide"));
 
 const Login = lazy(() => import("../page/authen/components/loginPage"));
+const Introduction = lazy(() => import("../page/introduction"));
 const Doctor = lazy(() => import("../page/doctor"));
 const Dashboard = lazy(() => import("../page/dashboard"));
 const Appointment = lazy(() => import("../page/appointment"));
 const RevenueReport = lazy(() => import("../page/revenue-report"));
 const TopDoctors = lazy(() => import("../page/top-doctors"));
 const UserManagement = lazy(() => import("../page/user"));
+
+// Report Pages
+const RevenueByPeriodPage = lazy(() => import("../page/reports/revenue-by-period"));
+const TopDoctorsReportPage = lazy(() => import("../page/reports/top-doctors"));
+const DoctorRevenuePage = lazy(() => import("../page/reports/doctor-revenue"));
 
 /* ===== Token helpers ===== */
 const getToken = () => localStorage.getItem("accessToken") || "";
@@ -55,7 +61,7 @@ function RequireAuth({ children }: PropsWithChildren) {
 
 function OnlyGuests({ children }: PropsWithChildren) {
   if (isAuthenticated()) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/introduction" replace />;
   }
   return <>{children}</>;
 }
@@ -81,7 +87,8 @@ const Router = [
       </RequireAuth>
     ),
     children: [
-      { path: "/", element: <Navigate to="/dashboard" replace /> },
+      { path: "/", element: <Navigate to="/introduction" replace /> },
+      { path: "/introduction", element: <Introduction /> },
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/facilities", element: <FacilityList /> },
       { path: "/specialties", element: <SpecialtyList /> },
@@ -101,12 +108,16 @@ const Router = [
       { path: "/content/faq", element: <FAQPage /> },
       { path: "/content/user-guide", element: <UserGuidePage /> },
 
+      // Report Routes
+      { path: "/reports/revenue-by-period", element: <RevenueByPeriodPage /> },
+      { path: "/reports/top-doctors", element: <TopDoctorsReportPage /> },
+      { path: "/reports/doctor-revenue", element: <DoctorRevenuePage /> },
+
       // { path: "/venue/list", element: <VenueList /> },
       // { path: "/user/list", element: <UserList /> },
       // { path: "/user/roles", element: <RolePermissionManager /> },
-      { path: "*", element: <Navigate to="/dashboard" /> },
-      // fallback DUY NHẤT: khi đã đăng nhập mà URL lạ -> về dashboard
-      { path: "*", element: <Navigate to="/dashboard" replace /> },
+      // fallback DUY NHẤT: khi đã đăng nhập mà URL lạ -> về introduction
+      { path: "*", element: <Navigate to="/introduction" replace /> },
     ],
   },
 ];

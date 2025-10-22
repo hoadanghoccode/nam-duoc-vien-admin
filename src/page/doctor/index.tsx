@@ -3,8 +3,9 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { Button, Card, Space, Table, Tag, Tooltip, Typography, Input, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
@@ -22,8 +23,12 @@ import { getAdminDoctorsAsync } from "../../store/doctor/adminDoctorsSlice";
 import { notifyStatus } from "../../utils/toast-notifier";
 import DoctorModal from "./components/DoctorModal";
 import { DoctorFormData } from "./types";
+import { getAdminMedicalFacilitiesAsync } from "../../store/facilities/adminMedicalFacilitySlice";
+import { getSpecialtiesAsync } from "../../store/specialty/specialtySlice";
 
 const { Title, Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
 
 const DoctorManagementPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -53,6 +58,12 @@ const DoctorManagementPage: React.FC = () => {
   const { error: detailError, data: doctorDetail } = useSelector(
     (state: RootState) => state.adminDoctorDetail
   );
+  const { data: facilitiesData } = useSelector(
+    (state: RootState) => state.adminMedicalFacility
+  );
+  const { data: specialtiesData } = useSelector(
+    (state: RootState) => state.specialty
+  );
 
   // Local states
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -64,6 +75,10 @@ const DoctorManagementPage: React.FC = () => {
     current: 1,
     pageSize: 10,
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [facilityFilter, setFacilityFilter] = useState<string | undefined>(undefined);
+  const [specialtyFilter, setSpecialtyFilter] = useState<string | undefined>(undefined);
+  const [doctorTitleFilter, setDoctorTitleFilter] = useState<string | undefined>(undefined);
 
   // Load doctors list
   const loadDoctors = useCallback(
@@ -73,14 +88,24 @@ const DoctorManagementPage: React.FC = () => {
           getAdminDoctorsAsync({
             page,
             limit,
+            searchTerm: searchTerm || undefined,
+            facilityId: facilityFilter,
+            specialtyId: specialtyFilter,
+            doctorTitle: doctorTitleFilter,
           })
         ).unwrap();
       } catch (error) {
         console.error("Error loading doctors:", error);
       }
     },
-    [dispatch]
+    [dispatch, searchTerm, facilityFilter, specialtyFilter, doctorTitleFilter]
   );
+
+  // Load facilities and specialties for filters
+  useEffect(() => {
+    dispatch(getAdminMedicalFacilitiesAsync({ page: 1, limit: 1000 }));
+    dispatch(getSpecialtiesAsync({ page: 1, limit: 1000 }));
+  }, [dispatch]);
 
   // Load doctors on mount and when pagination changes
   useEffect(() => {
@@ -331,6 +356,27 @@ const DoctorManagementPage: React.FC = () => {
     }
   };
 
+  // Handle search and filter
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleFacilityFilterChange = (value: string) => {
+    setFacilityFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleSpecialtyFilterChange = (value: string) => {
+    setSpecialtyFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleDoctorTitleFilterChange = (value: string) => {
+    setDoctorTitleFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
   // Handle table change
   const handleTableChange = (pagination: any) => {
     setPagination({
@@ -503,10 +549,58 @@ const DoctorManagementPage: React.FC = () => {
           style={{
             marginBottom: 16,
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
+            flexWrap: "wrap",
+            gap: 16,
           }}
         >
+          <Space wrap>
+            <Search
+              placeholder="Tìm kiếm theo tên, email..."
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 300 }}
+              enterButton={<SearchOutlined />}
+            />
+            <Select
+              placeholder="Lọc theo cơ sở"
+              style={{ width: 200 }}
+              allowClear
+              value={facilityFilter}
+              onChange={handleFacilityFilterChange}
+            >
+              {facilitiesData?.items?.map((facility: any) => (
+                <Option key={facility.id} value={facility.id}>
+                  {facility.facilityName}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Lọc theo chuyên khoa"
+              style={{ width: 200 }}
+              allowClear
+              value={specialtyFilter}
+              onChange={handleSpecialtyFilterChange}
+            >
+              {specialtiesData?.items?.map((specialty: any) => (
+                <Option key={specialty.id} value={specialty.id}>
+                  {specialty.specialtyName}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Lọc theo chức danh"
+              style={{ width: 150 }}
+              allowClear
+              value={doctorTitleFilter}
+              onChange={handleDoctorTitleFilterChange}
+            >
+              <Option value="Bác sĩ">Bác sĩ</Option>
+              <Option value="Thạc sĩ">Thạc sĩ</Option>
+              <Option value="Tiến sĩ">Tiến sĩ</Option>
+            </Select>
+          </Space>
           <Button
             type="primary"
             icon={<PlusOutlined />}

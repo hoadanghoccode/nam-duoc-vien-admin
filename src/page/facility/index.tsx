@@ -1,5 +1,5 @@
-import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { DeleteOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag, Tooltip, Typography, Input, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,8 +15,11 @@ import { notifyStatus } from "../../utils/toast-notifier";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { FacilityDetailModal } from "./components/FacilityDetailModal";
 import { FacilityFormData, FacilityModal } from "./components/FacilityModal";
+import { getSpecialtiesAsync } from "../../store/specialty/specialtySlice";
 
 const { Title, Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
 
 // Interface cho specialty option (không cần nữa vì đã tích hợp Redux)
 
@@ -49,6 +52,9 @@ const FacilityManagementPage = () => {
   const {
     data: facilityDetail,
   } = useSelector((state: RootState) => state.adminMedicalFacilityDetail);
+  const { data: specialtiesData } = useSelector(
+    (state: RootState) => state.specialty
+  );
 
   // Local states
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -67,6 +73,10 @@ const FacilityManagementPage = () => {
     current: 1,
     pageSize: 10,
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [cityFilter, setCityFilter] = useState<string | undefined>(undefined);
+  const [specialtyFilter, setSpecialtyFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<boolean | undefined>(undefined);
 
   // Load danh sách facilities với useCallback để tránh re-render
   const loadFacilities = useCallback(async () => {
@@ -75,12 +85,21 @@ const FacilityManagementPage = () => {
         getAdminMedicalFacilitiesAsync({
           page: pagination.current,
           limit: pagination.pageSize,
+          search: searchTerm || undefined,
+          city: cityFilter,
+          specialtyId: specialtyFilter,
+          isActive: statusFilter,
         })
       ).unwrap();
     } catch (error) {
       console.error("Error loading facilities:", error);
     }
-  }, [dispatch, pagination.current, pagination.pageSize]);
+  }, [dispatch, pagination.current, pagination.pageSize, searchTerm, cityFilter, specialtyFilter, statusFilter]);
+
+  // Load specialties for filters
+  useEffect(() => {
+    dispatch(getSpecialtiesAsync({ page: 1, limit: 1000 }));
+  }, [dispatch]);
 
   // Load danh sách facilities khi pagination thay đổi
   useEffect(() => {
@@ -314,12 +333,39 @@ const FacilityManagementPage = () => {
     }
   };
 
+  // Handle search and filter
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleCityFilterChange = (value: string) => {
+    setCityFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleSpecialtyFilterChange = (value: string) => {
+    setSpecialtyFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
+  const handleStatusFilterChange = (value: boolean) => {
+    setStatusFilter(value);
+    setPagination({ ...pagination, current: 1 });
+  };
+
   const handleTableChange = (pagination: any): void => {
     setPagination({
       current: pagination.current,
       pageSize: pagination.pageSize,
     });
   };
+
+  // Extract unique cities from facilities data
+  const uniqueCities = useMemo(() => {
+    const cities = listData?.items?.map((item: any) => item.city).filter(Boolean) || [];
+    return Array.from(new Set(cities));
+  }, [listData]);
 
   // Table columns với useMemo để tránh tạo lại mỗi lần render
   const columns: ColumnsType<any> = useMemo(
@@ -499,10 +545,57 @@ const FacilityManagementPage = () => {
           style={{
             marginBottom: 16,
             display: "flex",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
+            flexWrap: "wrap",
+            gap: 16,
           }}
         >
+          <Space wrap>
+            <Search
+              placeholder="Tìm kiếm theo tên, địa chỉ..."
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 300 }}
+              enterButton={<SearchOutlined />}
+            />
+            <Select
+              placeholder="Lọc theo thành phố"
+              style={{ width: 180 }}
+              allowClear
+              value={cityFilter}
+              onChange={handleCityFilterChange}
+            >
+              {uniqueCities.map((city: string) => (
+                <Option key={city} value={city}>
+                  {city}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Lọc theo chuyên khoa"
+              style={{ width: 200 }}
+              allowClear
+              value={specialtyFilter}
+              onChange={handleSpecialtyFilterChange}
+            >
+              {specialtiesData?.items?.map((specialty: any) => (
+                <Option key={specialty.id} value={specialty.id}>
+                  {specialty.specialtyName}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder="Lọc theo trạng thái"
+              style={{ width: 150 }}
+              allowClear
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+            >
+              <Option value={true}>Hoạt động</Option>
+              <Option value={false}>Tạm dừng</Option>
+            </Select>
+          </Space>
           <Button
             type="primary"
             icon={<PlusOutlined />}

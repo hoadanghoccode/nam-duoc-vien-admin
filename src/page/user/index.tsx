@@ -18,6 +18,7 @@ import {
   PlusOutlined,
   SearchOutlined,
   UserOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -28,12 +29,14 @@ import { getAdminUserByIdAsync } from "../../store/adminuser/adminUserDetailSlic
 import { createAdminUserAsync } from "../../store/adminuser/createAdminUserSlice";
 import { updateAdminUserAsync } from "../../store/adminuser/updateAdminUserSlice";
 import { deleteAdminUserAsync } from "../../store/adminuser/deleteAdminUserSlice";
+import { resetUserPasswordAsync } from "../../store/adminuser/resetUserPasswordSlice";
 import { uploadImageToCloud } from "../../helpers/upload";
 import { notifyStatus } from "../../utils/toast-notifier";
 import { getFullImageUrl } from "../../utils/image-utils";
 import { UserModal } from "./components/UserModal";
 import { UserDetailModal } from "./components/UserDetailModal";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
+import { ResetPasswordModal } from "./components/ResetPasswordModal";
 import { UserFormData } from "./types";
 import { AdminUserItem } from "../../api/adminUsersApi";
 
@@ -66,14 +69,21 @@ const UserManagementPage: React.FC = () => {
   const { byId: userDetailById, statusById } = useSelector(
     (state: RootState) => state.adminUserDetail
   );
+  const {
+    statusById: resetPasswordStatusById,
+    errorById: resetPasswordErrorById,
+    resultById: resetPasswordResultById,
+  } = useSelector((state: RootState) => state.resetUserPassword);
 
   // Local states
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [detailModalMode, setDetailModalMode] = useState<"view" | "edit">("view");
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [resetPasswordModalVisible, setResetPasswordModalVisible] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState<AdminUserItem | null>(null);
+  const [resettingUser, setResettingUser] = useState<AdminUserItem | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -101,14 +111,17 @@ const UserManagementPage: React.FC = () => {
   useEffect(() => {
     if (listError) notifyStatus(500, listError);
     if (createError) notifyStatus(500, createError);
-    // updateError và deleteError là objects, cần xử lý khác
+    // updateError, deleteError, resetPasswordError là objects, cần xử lý khác
     Object.values(updateErrorById).forEach((err) => {
       if (err) notifyStatus(500, err);
     });
     Object.values(deleteErrorById).forEach((err) => {
       if (err) notifyStatus(500, err);
     });
-  }, [listError, createError, updateErrorById, deleteErrorById]);
+    Object.values(resetPasswordErrorById).forEach((err) => {
+      if (err) notifyStatus(500, err);
+    });
+  }, [listError, createError, updateErrorById, deleteErrorById, resetPasswordErrorById]);
 
   // Handle create success
   useEffect(() => {
@@ -143,6 +156,18 @@ const UserManagementPage: React.FC = () => {
     }
   }, [deletedAt, loadUsers]);
 
+  // Handle reset password success
+  useEffect(() => {
+    const hasReset = Object.values(resetPasswordStatusById).some((s) => s === "succeeded");
+    const hasResult = Object.values(resetPasswordResultById).some((r) => r !== undefined);
+    
+    if (hasReset && hasResult) {
+      notifyStatus(200, "Đặt lại mật khẩu thành công!");
+      setResetPasswordModalVisible(false);
+      setResettingUser(null);
+    }
+  }, [resetPasswordStatusById, resetPasswordResultById]);
+
   // Modal handlers
   const handleOpenAddModal = () => {
     setCreateModalVisible(true);
@@ -169,6 +194,11 @@ const UserManagementPage: React.FC = () => {
     setDeleteModalVisible(true);
   };
 
+  const handleOpenResetPasswordModal = (user: AdminUserItem) => {
+    setResettingUser(user);
+    setResetPasswordModalVisible(true);
+  };
+
   const handleCloseCreateModal = () => {
     setCreateModalVisible(false);
   };
@@ -182,6 +212,11 @@ const UserManagementPage: React.FC = () => {
   const handleCloseDeleteModal = () => {
     setDeleteModalVisible(false);
     setDeletingUser(null);
+  };
+
+  const handleCloseResetPasswordModal = () => {
+    setResetPasswordModalVisible(false);
+    setResettingUser(null);
   };
 
   const handleDetailModalModeChange = (mode: "view" | "edit") => {
@@ -278,6 +313,16 @@ const UserManagementPage: React.FC = () => {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!resettingUser) return;
+    try {
+      await dispatch(resetUserPasswordAsync(resettingUser.id)).unwrap();
+    } catch (error) {
+      console.error("Reset password error:", error);
+      throw error;
+    }
+  };
+
   const handleTableChange = (pag: any) => {
     setPagination({
       current: pag.current,
@@ -367,7 +412,7 @@ const UserManagementPage: React.FC = () => {
       {
         title: "Thao tác",
         key: "actions",
-        width: 150,
+        width: 200,
         render: (_, record) => (
           <Space size="small">
             <Tooltip title="Xem chi tiết">
@@ -385,6 +430,15 @@ const UserManagementPage: React.FC = () => {
                 onClick={() => handleOpenEditModal(record)}
               />
             </Tooltip>
+            <Tooltip title="Reset mật khẩu">
+              <Button
+                size="small"
+                icon={<LockOutlined />}
+                onClick={() => handleOpenResetPasswordModal(record)}
+                loading={resetPasswordStatusById[record.id] === "loading"}
+                style={{ color: "#fa8c16", borderColor: "#fa8c16" }}
+              />
+            </Tooltip>
             <Tooltip title="Xóa">
               <Button
                 danger
@@ -398,7 +452,7 @@ const UserManagementPage: React.FC = () => {
         ),
       },
     ],
-    [pagination, deleteStatusById]
+    [pagination, deleteStatusById, resetPasswordStatusById]
   );
 
   const statistics = useMemo(() => {
@@ -523,6 +577,17 @@ const UserManagementPage: React.FC = () => {
         itemName={deletingUser?.displayName}
         loading={
           deletingUser ? deleteStatusById[deletingUser.id] === "loading" : false
+        }
+      />
+
+      {/* Reset Password Modal */}
+      <ResetPasswordModal
+        visible={resetPasswordModalVisible}
+        onClose={handleCloseResetPasswordModal}
+        onSubmit={handleResetPassword}
+        userName={resettingUser?.displayName}
+        loading={
+          resettingUser ? resetPasswordStatusById[resettingUser.id] === "loading" : false
         }
       />
     </div>

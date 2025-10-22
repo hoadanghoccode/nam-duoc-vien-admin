@@ -131,16 +131,16 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       label: "Báo cáo",
       children: [
         {
-          key: "/report/revenue",
-          label: "Báo cáo doanh thu",
+          key: "/reports/revenue-by-period",
+          label: "Tổng quan doanh thu",
         },
         {
-          key: "/report/usage",
-          label: "Báo cáo sử dụng",
+          key: "/reports/top-doctors",
+          label: "Top bác sĩ",
         },
         {
-          key: "/report/user",
-          label: "Báo cáo người dùng",
+          key: "/reports/doctor-revenue",
+          label: "Báo cáo bác sĩ",
         },
       ],
     },

@@ -45,6 +45,14 @@ import adminConfirmAppointmentReducer from "./appointments/adminConfirmAppointme
 import adminCompleteAppointmentReducer from "./appointments/adminCompleteAppointmentSlice";
 import adminCancelAppointmentReducer from "./appointments/adminCancelAppointmentSlice";
 
+// Admin User reducers
+import adminUsersReducer from "./adminuser/adminUsersSlice";
+import adminUserDetailReducer from "./adminuser/adminUserDetailSlice";
+import createAdminUserReducer from "./adminuser/createAdminUserSlice";
+import updateAdminUserReducer from "./adminuser/updateAdminUserSlice";
+import deleteAdminUserReducer from "./adminuser/deleteAdminUserSlice";
+import resetUserPasswordReducer from "./adminuser/resetUserPasswordSlice";
+
 // Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -83,6 +91,14 @@ const rootReducer = combineReducers({
   adminConfirmAppointment: adminConfirmAppointmentReducer,
   adminCompleteAppointment: adminCompleteAppointmentReducer,
   adminCancelAppointment: adminCancelAppointmentReducer,
+  
+  // Admin User reducers
+  adminUsers: adminUsersReducer,
+  adminUserDetail: adminUserDetailReducer,
+  createAdminUser: createAdminUserReducer,
+  updateAdminUser: updateAdminUserReducer,
+  deleteAdminUser: deleteAdminUserReducer,
+  resetUserPassword: resetUserPasswordReducer,
 });
 
 // Chỉ định reducer nào được lưu persist (bạn đổi lại theo mục đích, ví dụ: ['auth', 'customizer'] nếu muốn lưu cả customizer)

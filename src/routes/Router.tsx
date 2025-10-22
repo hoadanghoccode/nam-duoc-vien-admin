@@ -23,6 +23,7 @@ const Dashboard = lazy(() => import("../page/dashboard"));
 const Appointment = lazy(() => import("../page/appointment"));
 const RevenueReport = lazy(() => import("../page/revenue-report"));
 const TopDoctors = lazy(() => import("../page/top-doctors"));
+const UserManagement = lazy(() => import("../page/user"));
 
 /* ===== Token helpers ===== */
 const getToken = () => localStorage.getItem("accessToken") || "";
@@ -89,6 +90,7 @@ const Router = [
       { path: "/appointments", element: <Appointment /> },
       { path: "/revenue-report", element: <RevenueReport /> },
       { path: "/top-doctors", element: <TopDoctors /> },
+      { path: "/users", element: <UserManagement /> },
 
       // Content Management Routes
       { path: "/content/about-us", element: <AboutUsPage /> },

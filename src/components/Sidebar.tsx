@@ -7,6 +7,7 @@ import {
   UserOutlined,
   BarChartOutlined,
   TrophyOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
@@ -29,6 +30,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       key: "/dashboard",
       icon: <DashboardOutlined />,
       label: "Dashboard",
+    },
+    {
+      key: "/users",
+      icon: <TeamOutlined />,
+      label: "Quản lý người dùng",
     },
     {
       key: "/revenue-report",

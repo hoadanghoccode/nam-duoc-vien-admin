@@ -81,14 +81,14 @@ const Router = [
     ),
     children: [
       { path: "/", element: <Navigate to="/dashboard" replace /> },
-              { path: "/dashboard", element: <Dashboard /> },
-              { path: "/facilities", element: <FacilityList /> },
-              { path: "/specialties", element: <SpecialtyList /> },
-              { path: "/vietmap-demo", element: <VietmapDemo /> },
-              { path: "/doctor", element: <Doctor /> },
-              { path: "/appointments", element: <Appointment /> },
-              { path: "/revenue-report", element: <RevenueReport /> },
-              { path: "/top-doctors", element: <TopDoctors /> },
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/facilities", element: <FacilityList /> },
+      { path: "/specialties", element: <SpecialtyList /> },
+      { path: "/vietmap-demo", element: <VietmapDemo /> },
+      { path: "/doctor", element: <Doctor /> },
+      { path: "/appointments", element: <Appointment /> },
+      { path: "/revenue-report", element: <RevenueReport /> },
+      { path: "/top-doctors", element: <TopDoctors /> },
 
       // Content Management Routes
       { path: "/content/about-us", element: <AboutUsPage /> },

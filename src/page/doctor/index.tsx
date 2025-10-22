@@ -354,16 +354,19 @@ const DoctorManagementPage: React.FC = () => {
       key: "imageURL",
       width: 100,
       render: (imageURL: string) => (
-        <img
-          src={getFullImageUrl(imageURL)}
-          alt="Doctor"
-          style={{
-            width: 50,
-            height: 50,
-            objectFit: "cover",
-            borderRadius: 4,
-          }}
-        />
+        <>
+          {console.log("Doctor image URL:", getFullImageUrl(imageURL))}
+          <img
+            src={imageURL}
+            alt="Doctor"
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: 4,
+            }}
+          />
+        </>
       ),
     },
     {

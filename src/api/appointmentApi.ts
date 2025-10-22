@@ -21,8 +21,8 @@ export interface Appointment {
   id: string;
   appointmentDate: string;
   appointmentTime: string;
-  status: typeof AppointmentStatus[keyof typeof AppointmentStatus];
-  paymentStatus: typeof PaymentStatus[keyof typeof PaymentStatus];
+  status: (typeof AppointmentStatus)[keyof typeof AppointmentStatus];
+  paymentStatus: (typeof PaymentStatus)[keyof typeof PaymentStatus];
   notes?: string;
   patientId: string;
   patientName: string;
@@ -42,8 +42,8 @@ export interface Appointment {
 
 export interface AppointmentQuery {
   search?: string;
-  appointmentStatus?: typeof AppointmentStatus[keyof typeof AppointmentStatus];
-  paymentStatus?: typeof PaymentStatus[keyof typeof PaymentStatus];
+  appointmentStatus?: (typeof AppointmentStatus)[keyof typeof AppointmentStatus];
+  paymentStatus?: (typeof PaymentStatus)[keyof typeof PaymentStatus];
   doctorId?: string;
   facilityId?: string;
   startDate?: string;
@@ -51,7 +51,7 @@ export interface AppointmentQuery {
   page?: number;
   pageSize?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PagingResponse<T> {
@@ -65,7 +65,7 @@ export interface PagingResponse<T> {
 
 export interface UpdateAppointmentStatusPayload {
   id: string;
-  status: typeof AppointmentStatus[keyof typeof AppointmentStatus];
+  status: (typeof AppointmentStatus)[keyof typeof AppointmentStatus];
   notes?: string;
 }
 
@@ -76,10 +76,10 @@ export const appointmentApi = {
       "/admin/appointments",
       { params }
     ),
-  
+
   getAppointmentDetail: (id: string) =>
     authorizedAxiosInstance.get<Appointment>(`/admin/appointments/${id}`),
-  
+
   updateAppointmentStatus: (payload: UpdateAppointmentStatusPayload) =>
     authorizedAxiosInstance.put<Appointment>(
       `/admin/appointments/${payload.id}/status`,

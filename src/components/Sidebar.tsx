@@ -1,12 +1,12 @@
 import {
   CalendarOutlined,
-  DashboardOutlined,
+  // DashboardOutlined,
   EnvironmentOutlined,
   FileTextOutlined,
   MedicineBoxOutlined,
   UserOutlined,
-  BarChartOutlined,
-  TrophyOutlined,
+  // BarChartOutlined,
+  // TrophyOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
@@ -25,21 +25,21 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const location = useLocation();
 
   const menuItems: MenuProps["items"] = [
-    {
-      key: "/dashboard",
-      icon: <DashboardOutlined />,
-      label: "Dashboard",
-    },
-    {
-      key: "/revenue-report",
-      icon: <BarChartOutlined />,
-      label: "Báo cáo doanh thu",
-    },
-    {
-      key: "/top-doctors",
-      icon: <TrophyOutlined />,
-      label: "Top bác sĩ",
-    },
+    // {
+    //   key: "/dashboard",
+    //   icon: <DashboardOutlined />,
+    //   label: "Dashboard",
+    // },
+    // {
+    //   key: "/revenue-report",
+    //   icon: <BarChartOutlined />,
+    //   label: "Báo cáo doanh thu",
+    // },
+    // {
+    //   key: "/top-doctors",
+    //   icon: <TrophyOutlined />,
+    //   label: "Top bác sĩ",
+    // },
     {
       key: "content",
       icon: <FileTextOutlined />,
@@ -119,25 +119,25 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         },
       ],
     },
-    {
-      key: "report",
-      icon: <FileTextOutlined />,
-      label: "Báo cáo",
-      children: [
-        {
-          key: "/report/revenue",
-          label: "Báo cáo doanh thu",
-        },
-        {
-          key: "/report/usage",
-          label: "Báo cáo sử dụng",
-        },
-        {
-          key: "/report/user",
-          label: "Báo cáo người dùng",
-        },
-      ],
-    },
+    // {
+    //   key: "report",
+    //   icon: <FileTextOutlined />,
+    //   label: "Báo cáo",
+    //   children: [
+    //     {
+    //       key: "/report/revenue",
+    //       label: "Báo cáo doanh thu",
+    //     },
+    //     {
+    //       key: "/report/usage",
+    //       label: "Báo cáo sử dụng",
+    //     },
+    //     {
+    //       key: "/report/user",
+    //       label: "Báo cáo người dùng",
+    //     },
+    //   ],
+    // },
   ];
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {

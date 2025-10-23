@@ -5,7 +5,17 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { Button, Card, Space, Table, Tag, Tooltip, Typography, Input, Select } from "antd";
+import {
+  Button,
+  Card,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+  Input,
+  Select,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
@@ -76,9 +86,15 @@ const DoctorManagementPage: React.FC = () => {
     pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const [facilityFilter, setFacilityFilter] = useState<string | undefined>(undefined);
-  const [specialtyFilter, setSpecialtyFilter] = useState<string | undefined>(undefined);
-  const [doctorTitleFilter, setDoctorTitleFilter] = useState<string | undefined>(undefined);
+  const [facilityFilter, setFacilityFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [specialtyFilter, setSpecialtyFilter] = useState<string | undefined>(
+    undefined
+  );
+  const [doctorTitleFilter, setDoctorTitleFilter] = useState<
+    string | undefined
+  >(undefined);
 
   // Load doctors list
   const loadDoctors = useCallback(
@@ -396,14 +412,14 @@ const DoctorManagementPage: React.FC = () => {
     },
     {
       title: "Hình ảnh",
-      dataIndex: "imageURL",
-      key: "imageURL",
+      dataIndex: "imageUrl",
+      key: "imageUrl",
       width: 100,
       render: (imageURL: string) => (
         <>
           {console.log("Doctor image URL:", getFullImageUrl(imageURL))}
           <img
-            src={imageURL}
+            src={getFullImageUrl(imageURL)}
             alt="Doctor"
             style={{
               width: 50,

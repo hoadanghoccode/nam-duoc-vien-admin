@@ -1,22 +1,21 @@
 import {
+  BarChartOutlined,
   CalendarOutlined,
   DashboardOutlined,
   EnvironmentOutlined,
   FileTextOutlined,
   MedicineBoxOutlined,
-  UserOutlined,
-  BarChartOutlined,
-  TrophyOutlined,
   TeamOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
 import React, { useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import logo from "../../src/assets/logo/logon.png";
 import { RootState } from "../store/Store";
 import { hasRole, ROLES } from "../utils/role-utils";
-import logo from "../../src/assets/logo/logon.png";
 
 const { Sider } = Layout;
 
@@ -27,7 +26,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Lấy roles và userProfile từ Redux
   const userRoles = useSelector((state: RootState) => state.auth.roles);
   const userProfile = useSelector((state: RootState) => state.auth.userProfile);
@@ -35,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   // Filter menu items dựa trên roles
   const menuItems: MenuProps["items"] = useMemo(() => {
     const isAdmin = hasRole(userRoles, ROLES.ADMIN);
-    
+
     // Nếu không phải Admin (là Doctor hoặc User), chỉ hiển thị Appointments
     if (!isAdmin) {
       return [
@@ -52,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         },
       ];
     }
-    
+
     // Admin thấy tất cả menu
     const allMenuItems: MenuProps["items"] = [
       {
@@ -61,20 +60,40 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         label: "Dashboard",
       },
       {
-        key: "/users",
-        icon: <TeamOutlined />,
-        label: "Quản lý người dùng",
-      },
-      {
         key: "/revenue-report",
         icon: <BarChartOutlined />,
         label: "Báo cáo doanh thu",
       },
       {
-        key: "/top-doctors",
-        icon: <TrophyOutlined />,
-        label: "Top bác sĩ",
+        key: "report",
+        icon: <FileTextOutlined />,
+        label: "Báo cáo",
+        children: [
+          {
+            key: "/reports/revenue-by-period",
+            label: "Tổng quan doanh thu",
+          },
+          {
+            key: "/top-doctors",
+            label: "Top bác sĩ",
+          },
+          {
+            key: "/reports/doctor-revenue",
+            label: "Báo cáo bác sĩ",
+          },
+        ],
       },
+      {
+        key: "/users",
+        icon: <TeamOutlined />,
+        label: "Quản lý người dùng",
+      },
+
+      // {
+      //   key: "/top-doctors",
+      //   icon: <TrophyOutlined />,
+      //   label: "Top bác sĩ",
+      // },
       {
         key: "content",
         icon: <FileTextOutlined />,
@@ -122,6 +141,17 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         ],
       },
       {
+        key: "medicalfacilities",
+        icon: <EnvironmentOutlined />,
+        label: "Cơ sở y tế",
+        children: [
+          {
+            key: "/facilities",
+            label: "Danh sách cơ sở y tế",
+          },
+        ],
+      },
+      {
         key: "doctors",
         icon: <MedicineBoxOutlined />,
         label: "Bác sĩ",
@@ -143,38 +173,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           },
         ],
       },
-      {
-        key: "medicalfacilities",
-        icon: <EnvironmentOutlined />,
-        label: "Cơ sở y tế",
-        children: [
-          {
-            key: "/facilities",
-            label: "Danh sách cơ sở y tế",
-          },
-        ],
-      },
-      {
-        key: "report",
-        icon: <FileTextOutlined />,
-        label: "Báo cáo",
-        children: [
-          {
-            key: "/reports/revenue-by-period",
-            label: "Tổng quan doanh thu",
-          },
-          {
-            key: "/reports/top-doctors",
-            label: "Top bác sĩ",
-          },
-          {
-            key: "/reports/doctor-revenue",
-            label: "Báo cáo bác sĩ",
-          },
-        ],
-      },
     ];
-    
+
     return allMenuItems;
   }, [userRoles]);
 
@@ -185,7 +185,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       navigate(`${key}?doctorId=${userProfile.id}`);
       return;
     }
-    
+
     navigate(key);
   };
 
@@ -273,9 +273,19 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       >
         {!collapsed && (
           <div
-            style={{ fontSize: "16px", fontWeight: "bold", color: "#1890ff" }}
+            style={{
+              fontSize: "16px",
+              fontWeight: "bold",
+              color: "#1890ff",
+              cursor: "pointer",
+            }}
           >
-            <img width="80px" src={logo} alt="Logo" />
+            <img
+              width="80px"
+              src={logo}
+              alt="Logo"
+              onClick={() => navigate("/introduction")}
+            />
           </div>
         )}
 

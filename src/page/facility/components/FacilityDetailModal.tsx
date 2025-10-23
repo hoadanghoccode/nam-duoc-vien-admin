@@ -324,6 +324,12 @@ export const FacilityDetailModal: React.FC<FacilityDetailModalProps> = ({
       onCancel={onClose}
       footer={null}
       width={900}
+      bodyStyle={{ 
+        maxHeight: 800, 
+        overflowY: "auto", 
+        overflowX: "hidden",
+        paddingRight: "24px"
+      }}
       destroyOnClose
       maskClosable={true}
     >

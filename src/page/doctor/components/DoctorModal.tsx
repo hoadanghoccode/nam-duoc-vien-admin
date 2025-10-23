@@ -15,6 +15,8 @@ import {
   Divider,
   Spin,
   Card,
+  Table,
+  Tag,
 } from "antd";
 import {
   UserOutlined,
@@ -324,6 +326,26 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
     return timeSlotId;
   };
 
+  // Group time slots by day for table display
+  const groupTimeSlotsByDay = (timeSlots: DoctorTimeSlot[]) => {
+    const grouped: { [key: number]: string[] } = {};
+    
+    timeSlots.forEach(slot => {
+      if (!grouped[slot.dayOfWeek]) {
+        grouped[slot.dayOfWeek] = [];
+      }
+      grouped[slot.dayOfWeek].push(getTimeSlotText(slot.timeSlotId));
+    });
+
+    return Object.entries(grouped).map(([day, slots]) => ({
+      key: day,
+      dayOfWeek: parseInt(day),
+      dayName: getDayName(parseInt(day)),
+      timeSlots: slots,
+      slotCount: slots.length,
+    }));
+  };
+
   return (
     <Modal
       title={
@@ -336,6 +358,12 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
       open={visible}
       onCancel={handleClose}
       width={1400}
+      bodyStyle={{ 
+        maxHeight: 800, 
+        overflowY: "auto", 
+        overflowX: "hidden",
+        paddingRight: "24px"
+      }}
       footer={mode === 'view' ? [
         <Button key="cancel" onClick={handleClose}>
           Đóng
@@ -702,17 +730,47 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
           
           <div style={{ marginTop: 16 }}>
             {mode === 'view' ? (
-              // View mode - show selected time slots like in edit mode
+              // View mode - show time slots in a table
               initialValues?.timeSlots && initialValues.timeSlots.length > 0 ? (
                 <div>
-                  <Text strong>Đã chọn {initialValues.timeSlots.length} ca làm việc:</Text>
-                  <div style={{ marginTop: 8 }}>
-                    {initialValues.timeSlots.map((slot, index) => (
-                      <Text key={index} style={{ marginRight: 8 }}>
-                        {getTimeSlotText(slot.timeSlotId)} - {getDayName(slot.dayOfWeek)}
-                      </Text>
-                    ))}
-                  </div>
+                  <Text strong style={{ marginBottom: 16, display: 'block' }}>
+                    Lịch làm việc ({initialValues.timeSlots.length} ca)
+                  </Text>
+                  <Table
+                    dataSource={groupTimeSlotsByDay(initialValues.timeSlots)}
+                    pagination={false}
+                    size="small"
+                    bordered
+                    columns={[
+                      {
+                        title: 'Ngày',
+                        dataIndex: 'dayName',
+                        key: 'dayName',
+                        width: 120,
+                        render: (text: string) => <Tag color="blue">{text}</Tag>,
+                      },
+                      {
+                        title: 'Số ca',
+                        dataIndex: 'slotCount',
+                        key: 'slotCount',
+                        width: 80,
+                        align: 'center',
+                        render: (count: number) => <Tag color="green">{count} ca</Tag>,
+                      },
+                      {
+                        title: 'Khung giờ',
+                        dataIndex: 'timeSlots',
+                        key: 'timeSlots',
+                        render: (slots: string[]) => (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {slots.map((slot, idx) => (
+                              <Tag key={idx} color="geekblue">{slot}</Tag>
+                            ))}
+                          </div>
+                        ),
+                      },
+                    ]}
+                  />
                 </div>
               ) : (
                 <Text type="secondary">Chưa có lịch làm việc</Text>
@@ -737,7 +795,7 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
                   </Card>
                 )}
                 
-                {selectedTimeSlots.length > 0 && (
+                {/* {selectedTimeSlots.length > 0 && (
                   <div style={{ marginTop: 16 }}>
                     <Text strong>Đã chọn {selectedTimeSlots.length} ca làm việc:</Text>
                     <div style={{ marginTop: 8 }}>
@@ -748,7 +806,7 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
                       ))}
                     </div>
                   </div>
-                )}
+                )} */}
               </>
             )}
           </div>

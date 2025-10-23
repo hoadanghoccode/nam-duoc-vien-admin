@@ -21,19 +21,22 @@ const IntroductionPage: React.FC = () => {
     {
       icon: <MedicineBoxOutlined style={{ fontSize: 48, color: "#1890ff" }} />,
       title: "Quản lý Chuyên khoa",
-      description: "Quản lý danh sách các chuyên khoa y tế một cách hiệu quả và chuyên nghiệp.",
+      description:
+        "Quản lý danh sách các chuyên khoa y tế một cách hiệu quả và chuyên nghiệp.",
       path: "/specialties",
     },
     {
       icon: <EnvironmentOutlined style={{ fontSize: 48, color: "#52c41a" }} />,
       title: "Quản lý Cơ sở Y tế",
-      description: "Theo dõi và quản lý thông tin các cơ sở y tế trên toàn hệ thống.",
+      description:
+        "Theo dõi và quản lý thông tin các cơ sở y tế trên toàn hệ thống.",
       path: "/facilities",
     },
     {
       icon: <TeamOutlined style={{ fontSize: 48, color: "#722ed1" }} />,
       title: "Quản lý Bác sĩ",
-      description: "Quản lý hồ sơ, lịch làm việc và thông tin của đội ngũ bác sĩ.",
+      description:
+        "Quản lý hồ sơ, lịch làm việc và thông tin của đội ngũ bác sĩ.",
       path: "/doctors",
     },
     {
@@ -67,13 +70,23 @@ const IntroductionPage: React.FC = () => {
         }}
       >
         <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <HeartOutlined style={{ fontSize: 80, color: "#fff", marginBottom: 16 }} />
+          <HeartOutlined
+            style={{ fontSize: 80, color: "#fff", marginBottom: 16 }}
+          />
           <Title level={1} style={{ color: "#fff", marginBottom: 16 }}>
             Chào mừng đến với Hệ thống Quản lý Nam Dược Viện
           </Title>
-          <Paragraph style={{ color: "#fff", fontSize: 18, maxWidth: 800, margin: "0 auto" }}>
-            Nền tảng quản lý toàn diện cho các cơ sở y tế, giúp tối ưu hóa quy trình khám chữa bệnh
-            và nâng cao chất lượng dịch vụ chăm sóc sức khỏe.
+          <Paragraph
+            style={{
+              color: "#fff",
+              fontSize: 18,
+              maxWidth: 800,
+              margin: "0 auto",
+            }}
+          >
+            Nền tảng quản lý toàn diện cho các cơ sở y tế, giúp tối ưu hóa quy
+            trình khám chữa bệnh và nâng cao chất lượng dịch vụ chăm sóc sức
+            khỏe.
           </Paragraph>
         </div>
       </Card>
@@ -89,8 +102,9 @@ const IntroductionPage: React.FC = () => {
               <RocketOutlined style={{ fontSize: 48, color: "#1890ff" }} />
               <Title level={3}>Sứ mệnh</Title>
               <Paragraph>
-                Cung cấp giải pháp quản lý y tế hiện đại, giúp các cơ sở y tế vận hành hiệu quả,
-                tối ưu hóa quy trình làm việc và nâng cao trải nghiệm của bệnh nhân.
+                Cung cấp giải pháp quản lý y tế hiện đại, giúp các cơ sở y tế
+                vận hành hiệu quả, tối ưu hóa quy trình làm việc và nâng cao
+                trải nghiệm của bệnh nhân.
               </Paragraph>
             </Space>
           </Card>
@@ -104,8 +118,9 @@ const IntroductionPage: React.FC = () => {
               <HeartOutlined style={{ fontSize: 48, color: "#52c41a" }} />
               <Title level={3}>Tầm nhìn</Title>
               <Paragraph>
-                Trở thành nền tảng quản lý y tế hàng đầu Việt Nam, góp phần nâng cao chất lượng
-                chăm sóc sức khỏe cộng đồng và xây dựng hệ thống y tế thông minh, bền vững.
+                Trở thành nền tảng quản lý y tế hàng đầu Việt Nam, góp phần nâng
+                cao chất lượng chăm sóc sức khỏe cộng đồng và xây dựng hệ thống
+                y tế thông minh, bền vững.
               </Paragraph>
             </Space>
           </Card>
@@ -129,7 +144,11 @@ const IntroductionPage: React.FC = () => {
                 }}
                 onClick={() => navigate(feature.path)}
               >
-                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                <Space
+                  direction="vertical"
+                  size="middle"
+                  style={{ width: "100%" }}
+                >
                   {feature.icon}
                   <Title level={4}>{feature.title}</Title>
                   <Paragraph style={{ color: "#666" }}>
@@ -146,7 +165,7 @@ const IntroductionPage: React.FC = () => {
       </Card>
 
       {/* Statistics Section */}
-      <Card>
+      {/* <Card>
         <Title level={2} style={{ textAlign: "center", marginBottom: 40 }}>
           Về chúng tôi
         </Title>
@@ -184,7 +203,7 @@ const IntroductionPage: React.FC = () => {
             </Card>
           </Col>
         </Row>
-      </Card>
+      </Card> */}
 
       {/* Footer */}
       <Divider />
@@ -198,4 +217,3 @@ const IntroductionPage: React.FC = () => {
 };
 
 export default IntroductionPage;
-

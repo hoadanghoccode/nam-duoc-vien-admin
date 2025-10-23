@@ -2,16 +2,19 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Avatar, Button, Dropdown, Layout, Space, Typography } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store/Store";
 import authorizedAxiosInstance from "../services/Axios";
 import store from "../store/Store";
-import { setAccessToken } from "../store/authen/authSlice";
+import { setAccessToken, setUserProfile } from "../store/authen/authSlice";
+import { getMyProfileAsync } from "../store/user/userProfileSlice";
+import { getFullImageUrl } from "../utils/image-utils";
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -23,6 +26,21 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // Lấy userProfile từ Redux
+  const userProfile = useSelector((state: RootState) => state.auth.userProfile);
+  
+  // Gọi API lấy profile nếu chưa có
+  useEffect(() => {
+    if (!userProfile) {
+      dispatch(getMyProfileAsync()).then((result) => {
+        if (result.payload) {
+          dispatch(setUserProfile(result.payload as any));
+        }
+      });
+    }
+  }, [userProfile, dispatch]);
 
   // Dọn local + (tùy bạn) gọi API logout server
   const handleLogout = async () => {
@@ -47,14 +65,14 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
       icon: <UserOutlined />,
       label: "Thông tin cá nhân",
     },
-    {
-      key: "settings",
-      icon: <SettingOutlined />,
-      label: "Cài đặt",
-    },
-    {
-      type: "divider",
-    },
+    // {
+    //   key: "settings",
+    //   icon: <SettingOutlined />,
+    //   label: "Cài đặt",
+    // },
+    // {
+    //   type: "divider",
+    // },
     {
       key: "logout",
       icon: <LogoutOutlined />,
@@ -130,10 +148,11 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
           <Space style={{ cursor: "pointer" }}>
             <Avatar
               size="small"
-              icon={<UserOutlined />}
+              src={userProfile?.imageUrl ? getFullImageUrl(userProfile.imageUrl) : undefined}
+              icon={!userProfile?.imageUrl ? <UserOutlined /> : undefined}
               style={{ backgroundColor: "#1890ff" }}
             />
-            <Text>Admin User</Text>
+            <Text>{userProfile?.displayName || "Loading..."}</Text>
           </Space>
         </Dropdown>
       </Space>

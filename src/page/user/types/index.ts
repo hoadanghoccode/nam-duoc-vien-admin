@@ -3,6 +3,7 @@ export interface UserFormData {
   email: string;
   phoneNumber: string;
   password?: string;
+  confirmPassword?: string; // ✅ Thêm confirmPassword
   displayName: string;
   dateOfBirth?: string;
   gender?: number;

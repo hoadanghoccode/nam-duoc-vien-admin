@@ -66,10 +66,10 @@ const Header: React.FC<HeaderProps> = ({ collapsed, onToggle }) => {
   const handleUserMenuClick: MenuProps["onClick"] = ({ key }) => {
     switch (key) {
       case "profile":
-        console.log("Profile clicked");
+        navigate("/profile");
         break;
       case "settings":
-        console.log("Settings clicked");
+        navigate("/profile?tab=security");
         break;
       case "logout":
         handleLogout();

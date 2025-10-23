@@ -11,8 +11,11 @@ import {
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Layout, Menu } from "antd";
-import React from "react";
+import React, { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/Store";
+import { hasRole, ROLES } from "../utils/role-utils";
 import logo from "../../src/assets/logo/logon.png";
 
 const { Sider } = Layout;
@@ -24,129 +27,165 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Lấy roles và userProfile từ Redux
+  const userRoles = useSelector((state: RootState) => state.auth.roles);
+  const userProfile = useSelector((state: RootState) => state.auth.userProfile);
 
-  const menuItems: MenuProps["items"] = [
-    {
-      key: "/dashboard",
-      icon: <DashboardOutlined />,
-      label: "Dashboard",
-    },
-    {
-      key: "/users",
-      icon: <TeamOutlined />,
-      label: "Quản lý người dùng",
-    },
-    {
-      key: "/revenue-report",
-      icon: <BarChartOutlined />,
-      label: "Báo cáo doanh thu",
-    },
-    {
-      key: "/top-doctors",
-      icon: <TrophyOutlined />,
-      label: "Top bác sĩ",
-    },
-    {
-      key: "content",
-      icon: <FileTextOutlined />,
-      label: "Quản lý nội dung",
-      children: [
+  // Filter menu items dựa trên roles
+  const menuItems: MenuProps["items"] = useMemo(() => {
+    const isAdmin = hasRole(userRoles, ROLES.ADMIN);
+    
+    // Nếu không phải Admin (là Doctor hoặc User), chỉ hiển thị Appointments
+    if (!isAdmin) {
+      return [
         {
-          key: "/content/about-us",
-          label: "Về chúng tôi",
+          key: "appointments",
+          icon: <CalendarOutlined />,
+          label: "Cuộc hẹn",
+          children: [
+            {
+              key: "/appointments",
+              label: "Quản lý cuộc hẹn",
+            },
+          ],
         },
-        {
-          key: "/content/dong-y-intro",
-          label: "Giới thiệu Đông Y",
-        },
-        {
-          key: "/content/terms-of-service",
-          label: "Điều khoản dịch vụ",
-        },
-        {
-          key: "/content/privacy-policy",
-          label: "Chính sách bảo mật",
-        },
-        {
-          key: "/content/contact-info",
-          label: "Thông tin liên hệ",
-        },
-        {
-          key: "/content/faq",
-          label: "Câu hỏi thường gặp",
-        },
-        {
-          key: "/content/user-guide",
-          label: "Hướng dẫn sử dụng",
-        },
-      ],
-    },
-    {
-      key: "specialties",
-      icon: <UserOutlined />,
-      label: "Chuyên khoa",
-      children: [
-        {
-          key: "/specialties",
-          label: "Danh sách chuyên khoa",
-        },
-      ],
-    },
-    {
-      key: "doctors",
-      icon: <MedicineBoxOutlined />,
-      label: "Bác sĩ",
-      children: [
-        {
-          key: "/doctor",
-          label: "Danh sách bác sĩ",
-        },
-      ],
-    },
-    {
-      key: "appointments",
-      icon: <CalendarOutlined />,
-      label: "Cuộc hẹn",
-      children: [
-        {
-          key: "/appointments",
-          label: "Quản lý cuộc hẹn",
-        },
-      ],
-    },
-    {
-      key: "medicalfacilities",
-      icon: <EnvironmentOutlined />, // Cơ sở y tế: dùng Environment icon
-      label: "Cơ sở y tế",
-      children: [
-        {
-          key: "/facilities",
-          label: "Danh sách cơ sở y tế",
-        },
-      ],
-    },
-    {
-      key: "report",
-      icon: <FileTextOutlined />,
-      label: "Báo cáo",
-      children: [
-        {
-          key: "/reports/revenue-by-period",
-          label: "Tổng quan doanh thu",
-        },
-        {
-          key: "/reports/top-doctors",
-          label: "Top bác sĩ",
-        },
-        {
-          key: "/reports/doctor-revenue",
-          label: "Báo cáo bác sĩ",
-        },
-      ],
-    },
-  ];
+      ];
+    }
+    
+    // Admin thấy tất cả menu
+    const allMenuItems: MenuProps["items"] = [
+      {
+        key: "/dashboard",
+        icon: <DashboardOutlined />,
+        label: "Dashboard",
+      },
+      {
+        key: "/users",
+        icon: <TeamOutlined />,
+        label: "Quản lý người dùng",
+      },
+      {
+        key: "/revenue-report",
+        icon: <BarChartOutlined />,
+        label: "Báo cáo doanh thu",
+      },
+      {
+        key: "/top-doctors",
+        icon: <TrophyOutlined />,
+        label: "Top bác sĩ",
+      },
+      {
+        key: "content",
+        icon: <FileTextOutlined />,
+        label: "Quản lý nội dung",
+        children: [
+          {
+            key: "/content/about-us",
+            label: "Về chúng tôi",
+          },
+          {
+            key: "/content/dong-y-intro",
+            label: "Giới thiệu Đông Y",
+          },
+          {
+            key: "/content/terms-of-service",
+            label: "Điều khoản dịch vụ",
+          },
+          {
+            key: "/content/privacy-policy",
+            label: "Chính sách bảo mật",
+          },
+          {
+            key: "/content/contact-info",
+            label: "Thông tin liên hệ",
+          },
+          {
+            key: "/content/faq",
+            label: "Câu hỏi thường gặp",
+          },
+          {
+            key: "/content/user-guide",
+            label: "Hướng dẫn sử dụng",
+          },
+        ],
+      },
+      {
+        key: "specialties",
+        icon: <UserOutlined />,
+        label: "Chuyên khoa",
+        children: [
+          {
+            key: "/specialties",
+            label: "Danh sách chuyên khoa",
+          },
+        ],
+      },
+      {
+        key: "doctors",
+        icon: <MedicineBoxOutlined />,
+        label: "Bác sĩ",
+        children: [
+          {
+            key: "/doctor",
+            label: "Danh sách bác sĩ",
+          },
+        ],
+      },
+      {
+        key: "appointments",
+        icon: <CalendarOutlined />,
+        label: "Cuộc hẹn",
+        children: [
+          {
+            key: "/appointments",
+            label: "Quản lý cuộc hẹn",
+          },
+        ],
+      },
+      {
+        key: "medicalfacilities",
+        icon: <EnvironmentOutlined />,
+        label: "Cơ sở y tế",
+        children: [
+          {
+            key: "/facilities",
+            label: "Danh sách cơ sở y tế",
+          },
+        ],
+      },
+      {
+        key: "report",
+        icon: <FileTextOutlined />,
+        label: "Báo cáo",
+        children: [
+          {
+            key: "/reports/revenue-by-period",
+            label: "Tổng quan doanh thu",
+          },
+          {
+            key: "/reports/top-doctors",
+            label: "Top bác sĩ",
+          },
+          {
+            key: "/reports/doctor-revenue",
+            label: "Báo cáo bác sĩ",
+          },
+        ],
+      },
+    ];
+    
+    return allMenuItems;
+  }, [userRoles]);
 
   const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
+    // Nếu navigate tới /appointments và user là doctor, tự động thêm doctorId
+    if (key === "/appointments" && userProfile?.facilityId) {
+      // User có facilityId nghĩa là user này là doctor
+      navigate(`${key}?doctorId=${userProfile.id}`);
+      return;
+    }
+    
     navigate(key);
   };
 

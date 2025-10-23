@@ -30,7 +30,7 @@ export const createAdminUserAsync = createAsyncThunk<
     return res.data;
   } catch (err: any) {
     const msg =
-      err?.response?.data?.message ||
+      err?.response?.data?.errorMessage ||
       err?.message ||
       "Không thể tạo người dùng mới.";
     return rejectWithValue(msg);

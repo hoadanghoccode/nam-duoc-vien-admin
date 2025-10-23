@@ -229,6 +229,7 @@ const AppointmentActionModal: React.FC<AppointmentActionModalProps> = ({
       open={visible}
       onCancel={handleClose}
       width={800}
+      bodyStyle={{ maxHeight: 600, overflowY: "auto" }}
       footer={mode === "view" ? [
         <Button key="close" onClick={handleClose}>
           Đóng
@@ -270,7 +271,7 @@ const AppointmentActionModal: React.FC<AppointmentActionModalProps> = ({
               <Col span={12}>
                 <Space direction="vertical" size="small">
                   <Text strong>Giờ hẹn:</Text>
-                  <Text>{appointment.appointmentTime}</Text>
+                  <Text>{appointment.timeSlotDisplay}</Text>
                 </Space>
               </Col>
               <Col span={12}>
@@ -292,7 +293,7 @@ const AppointmentActionModal: React.FC<AppointmentActionModalProps> = ({
               <Col span={12}>
                 <Space direction="vertical" size="small">
                   <Text strong>Phí khám:</Text>
-                  <Text>{appointment.examinationFee ? appointment.examinationFee.toLocaleString("vi-VN") : "0"} VNĐ</Text>
+                  <Text>{appointment.fee ? appointment.fee.toLocaleString("vi-VN") : "0"} VNĐ</Text>
                 </Space>
               </Col>
             </Row>

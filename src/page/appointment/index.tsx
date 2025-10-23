@@ -13,6 +13,7 @@ import {
   DatePicker,
   Statistic,
   Tooltip,
+  Alert,
 } from "antd";
 import {
   SearchOutlined,
@@ -22,11 +23,13 @@ import {
   ClockCircleOutlined,
   UserOutlined,
   CalendarOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../store/Store";
 import { getAdminAppointmentsAsync } from "../../store/appointments/adminAppointmentsSlice";
+import { useSearchParams } from "react-router-dom";
 // Import from existing API
 const AppointmentStatus = {
   Pending: 1,
@@ -54,6 +57,10 @@ const AppointmentManagementPage: React.FC = () => {
     (state: RootState) => state.adminAppointments
   );
 
+  // Lấy doctorId từ URL query params (nếu có)
+  const [searchParams] = useSearchParams();
+  const doctorIdFromUrl = searchParams.get("doctorId") || undefined;
+
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<typeof AppointmentStatus[keyof typeof AppointmentStatus] | undefined>();
@@ -69,6 +76,7 @@ const AppointmentManagementPage: React.FC = () => {
   useEffect(() => {
     dispatch(getAdminAppointmentsAsync({
       searchTerm: searchTerm,
+      doctorId: doctorIdFromUrl, // Tự động filter theo doctorId nếu có trong URL
       status: selectedStatus,
       paymentStatus: selectedPaymentStatus,
       fromDate: dateRange?.[0]?.format("YYYY-MM-DD"),
@@ -76,7 +84,7 @@ const AppointmentManagementPage: React.FC = () => {
       pageIndex: 1,
       pageSize: 100,
     }));
-  }, [dispatch, searchTerm, selectedStatus, selectedPaymentStatus, dateRange]);
+  }, [dispatch, searchTerm, doctorIdFromUrl, selectedStatus, selectedPaymentStatus, dateRange]);
 
   // Handle filter by status card click
   const handleStatusFilter = (status: typeof AppointmentStatus[keyof typeof AppointmentStatus]) => {
@@ -106,6 +114,7 @@ const AppointmentManagementPage: React.FC = () => {
   const handleRefresh = () => {
     dispatch(getAdminAppointmentsAsync({
       searchTerm: searchTerm,
+      doctorId: doctorIdFromUrl, // Giữ nguyên filter theo doctorId khi refresh
       status: selectedStatus,
       paymentStatus: selectedPaymentStatus,
       fromDate: dateRange?.[0]?.format("YYYY-MM-DD"),
@@ -260,8 +269,8 @@ const AppointmentManagementPage: React.FC = () => {
     },
     {
       title: "Phí khám",
-      dataIndex: "examinationFee",
-      key: "examinationFee",
+      dataIndex: "fee",
+      key: "fee",
       width: 120,
       render: (fee: number) => fee ? `${fee.toLocaleString("vi-VN")} VNĐ` : "0 VNĐ",
     },
@@ -328,6 +337,19 @@ const AppointmentManagementPage: React.FC = () => {
   return (
     <div style={{ padding: "24px" }}>
       <Title level={2}>Quản lý cuộc hẹn</Title>
+
+      {/* Alert khi filter theo doctorId */}
+      {doctorIdFromUrl && (
+        <Alert
+          message="Đang hiển thị các cuộc hẹn của bạn"
+          description="Bạn đang xem danh sách các cuộc hẹn được phân công cho bạn với vai trò bác sĩ."
+          type="info"
+          icon={<InfoCircleOutlined />}
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
       {/* Statistics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
@@ -447,9 +469,10 @@ const AppointmentManagementPage: React.FC = () => {
               placeholder="Trạng thái cuộc hẹn"
               value={selectedStatus}
               onChange={setSelectedStatus}
-              allowClear
+              defaultValue={undefined}
               style={{ width: "100%" }}
             >
+              <Option value={undefined}>Tất cả</Option>
               <Option value={AppointmentStatus.Pending}>Chờ xác nhận</Option>
               <Option value={AppointmentStatus.Confirmed}>Đã xác nhận</Option>
               <Option value={AppointmentStatus.Completed}>Đã hoàn thành</Option>
@@ -462,9 +485,10 @@ const AppointmentManagementPage: React.FC = () => {
               placeholder="Trạng thái thanh toán"
               value={selectedPaymentStatus}
               onChange={setSelectedPaymentStatus}
-              allowClear
+              defaultValue={undefined}
               style={{ width: "100%" }}
             >
+              <Option value={undefined}>Tất cả</Option>
               <Option value={PaymentStatus.Unpaid}>Chưa thanh toán</Option>
               <Option value={PaymentStatus.Paid}>Đã thanh toán</Option>
               <Option value={PaymentStatus.Refunded}>Đã hoàn tiền</Option>

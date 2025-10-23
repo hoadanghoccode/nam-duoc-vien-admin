@@ -10,6 +10,7 @@ console.log("VITE_BASE_URL", import.meta.env.VITE_BASE_URL);
 // Những endpoint KHÔNG nên gắn bearer / không tự refresh (auth flow)
 const AUTH_BYPASS_PATHS = [
   "/Authentication/Login",
+  "/Authentication/LoginAdmin", // <- Admin login endpoint
   "/Authentication/register",
   "/Authentication/RequestForgotPassword",
   "/Authentication/ConfirmForgotPassword",
@@ -152,8 +153,17 @@ authorizedAxiosInstance.interceptors.response.use(
         originalRequest.headers = originalRequest.headers || {};
         (originalRequest.headers as any).Authorization = `Bearer ${newAccess}`;
         return authorizedAxiosInstance(originalRequest);
-      } catch (e) {
-        return Promise.reject(e);
+      } catch (refreshError) {
+        // Refresh token thất bại -> Clear tokens và redirect về login
+        console.error("Refresh token failed:", refreshError);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        store.dispatch(setAccessToken(null));
+        
+        // Redirect về trang login
+        window.location.href = "/auth/login";
+        
+        return Promise.reject(refreshError);
       }
     }
 

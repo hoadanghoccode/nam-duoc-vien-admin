@@ -97,6 +97,8 @@ export const UserModal: React.FC<UserModalProps> = ({
         imageUrl: imagePreview || "",
       };
 
+      console.log("Submit data:", submitData);
+
       await onSubmit(submitData);
       handleClose();
     } catch (error) {
@@ -177,7 +179,7 @@ export const UserModal: React.FC<UserModalProps> = ({
 
         {mode === "create" && (
           <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 name="password"
                 label="Mật khẩu"
@@ -187,6 +189,26 @@ export const UserModal: React.FC<UserModalProps> = ({
                 ]}
               >
                 <Input.Password placeholder="Nhập mật khẩu" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="confirmPassword"
+                label="Xác nhận mật khẩu"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: "Vui lòng xác nhận mật khẩu" },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Nhập lại mật khẩu" />
               </Form.Item>
             </Col>
           </Row>

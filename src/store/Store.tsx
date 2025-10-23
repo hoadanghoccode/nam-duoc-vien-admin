@@ -53,6 +53,10 @@ import updateAdminUserReducer from "./adminuser/updateAdminUserSlice";
 import deleteAdminUserReducer from "./adminuser/deleteAdminUserSlice";
 import resetUserPasswordReducer from "./adminuser/resetUserPasswordSlice";
 
+// User Profile reducer
+import userProfileReducer from "./user/userProfileSlice";
+import changePasswordReducer from "./user/changePasswordSlice";
+
 // Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -99,10 +103,14 @@ const rootReducer = combineReducers({
   updateAdminUser: updateAdminUserReducer,
   deleteAdminUser: deleteAdminUserReducer,
   resetUserPassword: resetUserPasswordReducer,
+  
+  // User Profile
+  userProfile: userProfileReducer,
+  changePassword: changePasswordReducer,
 });
 
 // Chỉ định reducer nào được lưu persist (bạn đổi lại theo mục đích, ví dụ: ['auth', 'customizer'] nếu muốn lưu cả customizer)
-const whitelistReducers = ["auth", "userInfor"]; // hoặc ['auth', 'customizer']
+const whitelistReducers = ["auth"]; // Lưu auth state bao gồm userProfile và roles
 
 const persistConfig = {
   key: "root",

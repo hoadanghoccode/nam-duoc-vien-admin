@@ -42,8 +42,8 @@ export interface AdminUsersQuery {
   PageSize?: number;
   OrderColumn?: string;
   OrderDirection?: "asc" | "desc";
-  Role?: "Admin" | "User";
-  SearchTerm?: string;
+  Roles?: "Admin" | "User";
+  SearchingKeyWord?: string;
   IsActive?: boolean;
 }
 
@@ -60,6 +60,7 @@ export interface CreateAdminUserRequest {
   email: string;
   phoneNumber: string;
   password: string;
+  confirmPassword: string;
   displayName: string;
   isActive: boolean;
   status?: number;
@@ -147,6 +148,12 @@ export type UserProfile = {
   }>;
 };
 
+export type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
+
 // ========== API ==========
 export const adminUsersApi = {
   // Get list with pagination
@@ -155,10 +162,13 @@ export const adminUsersApi = {
     if (query.PageIndex) params.append("PageIndex", query.PageIndex.toString());
     if (query.PageSize) params.append("PageSize", query.PageSize.toString());
     if (query.OrderColumn) params.append("OrderColumn", query.OrderColumn);
-    if (query.OrderDirection) params.append("OrderDirection", query.OrderDirection);
-    if (query.Role) params.append("Role", query.Role);
-    if (query.SearchTerm) params.append("SearchTerm", query.SearchTerm);
-    if (query.IsActive !== undefined) params.append("IsActive", query.IsActive.toString());
+    if (query.OrderDirection)
+      params.append("OrderDirection", query.OrderDirection);
+    if (query.Roles) params.append("Roles", query.Roles);
+    if (query.SearchingKeyWord)
+      params.append("SearchingKeyWord", query.SearchingKeyWord);
+    if (query.IsActive !== undefined)
+      params.append("IsActive", query.IsActive.toString());
 
     return authorizedAxiosInstance.get<PagingResponse<AdminUserItem>>(
       `/admin/users?${params.toString()}`
@@ -177,7 +187,17 @@ export const adminUsersApi = {
 
   // Update
   update: (id: string, data: UpdateAdminUserRequest) => {
-    return authorizedAxiosInstance.put<AdminUserDetail>(`/admin/users/${id}`, data);
+    return authorizedAxiosInstance.put<AdminUserDetail>(
+      `/admin/users/${id}`,
+      data
+    );
+  },
+
+  changePassword: (data: ChangePasswordRequest) => {
+    return authorizedAxiosInstance.post(
+      "/public/users/me/change-password",
+      data
+    );
   },
 
   // Delete
@@ -196,5 +216,9 @@ export const adminUsersApi = {
   },
   getMyProfile: () => {
     return authorizedAxiosInstance.get<UserProfile>("/public/users/me");
+  },
+
+  updateMyProfile: (data: Partial<UserProfile>) => {
+    return authorizedAxiosInstance.put<UserProfile>("/public/users/me", data);
   },
 };

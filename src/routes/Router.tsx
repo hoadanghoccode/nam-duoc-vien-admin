@@ -31,6 +31,9 @@ const RevenueByPeriodPage = lazy(() => import("../page/reports/revenue-by-period
 const TopDoctorsReportPage = lazy(() => import("../page/reports/top-doctors"));
 const DoctorRevenuePage = lazy(() => import("../page/reports/doctor-revenue"));
 
+// Profile Page
+const UserProfilePage = lazy(() => import("../page/profile"));
+
 /* ===== Token helpers ===== */
 const getToken = () => localStorage.getItem("accessToken") || "";
 
@@ -112,6 +115,9 @@ const Router = [
       { path: "/reports/revenue-by-period", element: <RevenueByPeriodPage /> },
       { path: "/reports/top-doctors", element: <TopDoctorsReportPage /> },
       { path: "/reports/doctor-revenue", element: <DoctorRevenuePage /> },
+
+      // Profile Route
+      { path: "/profile", element: <UserProfilePage /> },
 
       // { path: "/venue/list", element: <VenueList /> },
       // { path: "/user/list", element: <UserList /> },

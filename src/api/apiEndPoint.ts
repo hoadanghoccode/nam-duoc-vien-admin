@@ -2,7 +2,7 @@ import authorizedAxiosInstance from "../services/Axios";
 
 export const authen = {
   login: (credentials: { email: string; password: string }) => {
-    return authorizedAxiosInstance.post("/Authentication/Login", credentials);
+    return authorizedAxiosInstance.post("/Authentication/LoginAdmin", credentials);
   },
   role: () => {
     return authorizedAxiosInstance.get("/Role/GetRoles");

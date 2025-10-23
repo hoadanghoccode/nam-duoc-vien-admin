@@ -65,6 +65,9 @@ export const uploadMultipleImages = async (files: any[]) => {
   }
 };
 
+// Alias for profile avatar upload
+export const uploadImageForProfile = uploadImageToCloud;
+
 // Helper function để tạo full URL khi hiển thị
 export const getFullImageUrl = (fileUrl: string) => {
   if (!fileUrl) return "";

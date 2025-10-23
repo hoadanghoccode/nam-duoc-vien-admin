@@ -1,0 +1,247 @@
+.user-profile-page-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d4a5f9 100%);
+  padding: 24px;
+}
+
+.profile-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: transparent;
+}
+
+/* Sidebar */
+.profile-sidebar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-right: 24px;
+}
+
+.profile-menu {
+  border: none;
+}
+
+.profile-menu .ant-menu-item {
+  height: 56px;
+  line-height: 56px;
+  margin: 4px 8px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.profile-menu .ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.profile-menu .ant-menu-item-selected .anticon {
+  color: #fff;
+}
+
+/* Main Content */
+.profile-main-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-height: 600px;
+}
+
+/* Header Banner with Avatar */
+.profile-header-banner {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d4a5f9 100%);
+  height: 200px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  padding-bottom: 40px;
+}
+
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.avatar-container .ant-avatar {
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.avatar-upload-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.avatar-upload-overlay:hover {
+  transform: scale(1.1);
+}
+
+/* Tabs */
+.profile-tabs {
+  padding: 0 32px;
+}
+
+.profile-tabs .ant-tabs-nav {
+  margin-bottom: 32px;
+}
+
+.profile-tabs .ant-tabs-tab {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 24px;
+}
+
+/* Info Card */
+.info-card {
+  border: none;
+  box-shadow: none;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 32px;
+  color: #262626;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  font-size: 14px;
+  color: #595959;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-value {
+  font-size: 15px;
+  color: #262626;
+  font-weight: 400;
+}
+
+/* Security Card */
+.security-content {
+  padding: 32px;
+}
+
+.security-card {
+  max-width: 600px;
+  border: none;
+  box-shadow: none;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.error-message {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.form-actions .ant-btn {
+  min-width: 120px;
+  height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.form-actions .ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .user-profile-page-wrapper {
+    padding: 12px;
+  }
+
+  .profile-sidebar {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-tabs {
+    padding: 0 16px;
+  }
+
+  .security-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-header-banner {
+    height: 150px;
+  }
+
+  .avatar-container .ant-avatar {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .profile-tabs .ant-tabs-tab {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+}

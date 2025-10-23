@@ -5,10 +5,41 @@ import {
 } from "@reduxjs/toolkit";
 import { authen } from "../../api/apiEndPoint";
 
+interface UserProfile {
+  id: string;
+  userName: string;
+  email: string;
+  displayName: string;
+  phoneNumber: string;
+  title: string | null;
+  status: string;
+  isActive: boolean;
+  dateOfBirth: string | null;
+  gender: number | null;
+  address: string | null;
+  imageUrl: string | null;
+  isEmailVerified: boolean;
+  facilityId: string | null;
+  facilityName: string | null;
+  doctorTitle: string | null;
+  bio: string | null;
+  examinationFee: number | null;
+  yearsOfExperience: number | null;
+  licenseNumber: string | null;
+  roles?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    isActive: boolean;
+  }>;
+}
+
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   user: any | null;
+  userProfile: UserProfile | null;
+  roles: string[];
   loading: boolean;
   error: string | null;
 }
@@ -35,6 +66,8 @@ const initialState: AuthState = {
   accessToken: localStorage.getItem("accessToken"),
   refreshToken: localStorage.getItem("refreshToken"),
   user: null,
+  userProfile: null,
+  roles: [],
   loading: false,
   error: null,
 };
@@ -102,9 +135,15 @@ const authSlice = createSlice({
       console.log("setAccessToken", action.payload);
       state.accessToken = action.payload;
     },
+    setUserProfile(state, action: PayloadAction<UserProfile>) {
+      state.userProfile = action.payload;
+      state.roles = action.payload.roles?.map((role) => role.name) || [];
+    },
     clearTokens: (state) => {
       state.accessToken = null;
       state.refreshToken = null;
+      state.userProfile = null;
+      state.roles = [];
     },
   },
   extraReducers: (builder) => {
@@ -134,6 +173,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.accessToken = null;
         state.user = null;
+        state.userProfile = null;
+        state.roles = [];
         state.error = null;
       })
       .addCase(logoutAsync.rejected, (state, action) => {
@@ -143,5 +184,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setTokens, setAccessToken, clearTokens } = authSlice.actions;
+export const { setTokens, setAccessToken, setUserProfile, clearTokens } = authSlice.actions;
 export default authSlice.reducer;

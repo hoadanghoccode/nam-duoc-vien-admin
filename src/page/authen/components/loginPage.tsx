@@ -5,7 +5,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { dispatch } from "../../../store/Store";
-import { loginAsync } from "../../../store/authen/authSlice";
+import { loginAsync, setUserProfile } from "../../../store/authen/authSlice";
+import { getMyProfileAsync } from "../../../store/appointments/userProfileSlice";
 
 const { Title, Text } = Typography;
 
@@ -39,7 +40,21 @@ const LoginPage = () => {
 
       // Kiểm tra nếu thành công
       if (result.payload?.status === 200) {
-        navigate("/dashboard");
+        // Gọi API lấy profile để lấy roles
+        try {
+          const profileResult = await dispatch(getMyProfileAsync());
+          
+          if (profileResult.payload && typeof profileResult.payload === 'object' && 'id' in profileResult.payload) {
+            // Lưu profile vào Redux (bao gồm roles)
+            dispatch(setUserProfile(profileResult.payload as any));
+          }
+          
+          navigate("/introduction");
+        } catch (profileError) {
+          console.error("Error fetching profile:", profileError);
+          // Vẫn cho phép đăng nhập dù không lấy được profile
+          navigate("/introduction");
+        }
       } else {
         // Xử lý các trường hợp lỗi khác nhau
         handleApiError(result);

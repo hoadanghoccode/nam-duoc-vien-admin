@@ -1,44 +1,43 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  LockOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import {
+  Avatar,
   Button,
+  Card,
+  Input,
+  Select,
   Space,
   Table,
   Tag,
   Tooltip,
   Typography,
-  Card,
-  Input,
-  Select,
-  Avatar,
 } from "antd";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeOutlined,
-  PlusOutlined,
-  SearchOutlined,
-  UserOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { AdminUserItem } from "../../api/adminUsersApi";
+import { uploadImageToCloud } from "../../helpers/upload";
 import { AppDispatch, RootState } from "../../store/Store";
-import { getAdminUsersAsync } from "../../store/adminuser/adminUsersSlice";
 import { getAdminUserByIdAsync } from "../../store/adminuser/adminUserDetailSlice";
+import { getAdminUsersAsync } from "../../store/adminuser/adminUsersSlice";
 import { createAdminUserAsync } from "../../store/adminuser/createAdminUserSlice";
-import { updateAdminUserAsync } from "../../store/adminuser/updateAdminUserSlice";
 import { deleteAdminUserAsync } from "../../store/adminuser/deleteAdminUserSlice";
 import { resetUserPasswordAsync } from "../../store/adminuser/resetUserPasswordSlice";
-import { uploadImageToCloud } from "../../helpers/upload";
-import { notifyStatus } from "../../utils/toast-notifier";
+import { updateAdminUserAsync } from "../../store/adminuser/updateAdminUserSlice";
 import { getFullImageUrl } from "../../utils/image-utils";
-import { UserModal } from "./components/UserModal";
-import { UserDetailModal } from "./components/UserDetailModal";
+import { notifyStatus } from "../../utils/toast-notifier";
 import { DeleteConfirmModal } from "./components/DeleteConfirmModal";
 import { ResetPasswordModal } from "./components/ResetPasswordModal";
+import { UserDetailModal } from "./components/UserDetailModal";
+import { UserModal } from "./components/UserModal";
 import { UserFormData } from "./types";
-import { AdminUserItem } from "../../api/adminUsersApi";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -48,9 +47,11 @@ const UserManagementPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   // Redux states
-  const { status, data: listData, error: listError } = useSelector(
-    (state: RootState) => state.adminUsers
-  );
+  const {
+    status,
+    data: listData,
+    error: listError,
+  } = useSelector((state: RootState) => state.adminUsers);
   const {
     status: createStatus,
     error: createError,
@@ -78,18 +79,25 @@ const UserManagementPage: React.FC = () => {
   // Local states
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [detailModalMode, setDetailModalMode] = useState<"view" | "edit">("view");
+  const [detailModalMode, setDetailModalMode] = useState<"view" | "edit">(
+    "view"
+  );
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [resetPasswordModalVisible, setResetPasswordModalVisible] = useState(false);
+  const [resetPasswordModalVisible, setResetPasswordModalVisible] =
+    useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [deletingUser, setDeletingUser] = useState<AdminUserItem | null>(null);
-  const [resettingUser, setResettingUser] = useState<AdminUserItem | null>(null);
+  const [resettingUser, setResettingUser] = useState<AdminUserItem | null>(
+    null
+  );
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState<"Admin" | "User" | undefined>("User");
+  const [roleFilter, setRoleFilter] = useState<"Admin" | "User" | undefined>(
+    "User"
+  );
 
   // Load users
   const loadUsers = useCallback(() => {
@@ -97,11 +105,17 @@ const UserManagementPage: React.FC = () => {
       getAdminUsersAsync({
         PageIndex: pagination.current,
         PageSize: pagination.pageSize,
-        SearchTerm: searchTerm || undefined,
-        Role: roleFilter,
+        SearchingKeyWord: searchTerm || undefined,
+        Roles: roleFilter,
       })
     );
-  }, [dispatch, pagination.current, pagination.pageSize, searchTerm, roleFilter]);
+  }, [
+    dispatch,
+    pagination.current,
+    pagination.pageSize,
+    searchTerm,
+    roleFilter,
+  ]);
 
   useEffect(() => {
     loadUsers();
@@ -121,7 +135,13 @@ const UserManagementPage: React.FC = () => {
     Object.values(resetPasswordErrorById).forEach((err) => {
       if (err) notifyStatus(500, err);
     });
-  }, [listError, createError, updateErrorById, deleteErrorById, resetPasswordErrorById]);
+  }, [
+    listError,
+    createError,
+    updateErrorById,
+    deleteErrorById,
+    resetPasswordErrorById,
+  ]);
 
   // Handle create success
   useEffect(() => {
@@ -134,9 +154,13 @@ const UserManagementPage: React.FC = () => {
 
   // Handle update success
   useEffect(() => {
-    const hasSucceeded = Object.values(updateStatusById).some((s) => s === "succeeded");
-    const hasResult = Object.values(updateResultById).some((r) => r !== undefined);
-    
+    const hasSucceeded = Object.values(updateStatusById).some(
+      (s) => s === "succeeded"
+    );
+    const hasResult = Object.values(updateResultById).some(
+      (r) => r !== undefined
+    );
+
     if (hasSucceeded && hasResult) {
       notifyStatus(200, "Cập nhật người dùng thành công!");
       setDetailModalVisible(false);
@@ -148,7 +172,7 @@ const UserManagementPage: React.FC = () => {
   // Handle delete success
   useEffect(() => {
     const hasDeleted = Object.keys(deletedAt).length > 0;
-    
+
     if (hasDeleted) {
       notifyStatus(200, "Xóa người dùng thành công!");
       setDeleteModalVisible(false);
@@ -158,9 +182,13 @@ const UserManagementPage: React.FC = () => {
 
   // Handle reset password success
   useEffect(() => {
-    const hasReset = Object.values(resetPasswordStatusById).some((s) => s === "succeeded");
-    const hasResult = Object.values(resetPasswordResultById).some((r) => r !== undefined);
-    
+    const hasReset = Object.values(resetPasswordStatusById).some(
+      (s) => s === "succeeded"
+    );
+    const hasResult = Object.values(resetPasswordResultById).some(
+      (r) => r !== undefined
+    );
+
     if (hasReset && hasResult) {
       notifyStatus(200, "Đặt lại mật khẩu thành công!");
       setResetPasswordModalVisible(false);
@@ -240,22 +268,25 @@ const UserManagementPage: React.FC = () => {
         }
       }
 
+      const payload = {
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        password: values.password || "",
+        confirmPassword: values.confirmPassword || values.password || "",
+        displayName: values.displayName,
+        dateOfBirth: values.dateOfBirth,
+        gender: values.gender,
+        address: values.address,
+        imageUrl: finalImageUrl,
+        roles: [values.role], // Convert role string to roles array
+        isActive: values.isActive,
+        status: values.isActive ? 1 : 0, // Map isActive to status
+      };
+
+      console.log("handleCreateSubmit - API payload:", payload);
+
       // Create
-      await dispatch(
-        createAdminUserAsync({
-          email: values.email,
-          phoneNumber: values.phoneNumber,
-          password: values.password || "123456",
-          displayName: values.displayName,
-          dateOfBirth: values.dateOfBirth,
-          gender: values.gender,
-          address: values.address,
-          imageUrl: finalImageUrl,
-          roles: [values.role], // Convert role string to roles array
-          isActive: values.isActive,
-          status: values.isActive ? 1 : 0, // Map isActive to status
-        })
-      ).unwrap();
+      await dispatch(createAdminUserAsync(payload)).unwrap();
     } catch (error: any) {
       console.error("Error in handleCreateSubmit:", error);
       throw error;
@@ -264,7 +295,7 @@ const UserManagementPage: React.FC = () => {
 
   const handleDetailSubmit = async (values: UserFormData) => {
     if (!values.id) return;
-    
+
     try {
       let finalImageUrl = values.imageUrl || "";
 
@@ -353,9 +384,13 @@ const UserManagementPage: React.FC = () => {
       {
         title: "Người dùng",
         key: "user",
+        width: 150,
         render: (_, record) => (
           <Space>
-            <Avatar src={getFullImageUrl(record.imageUrl)} icon={<UserOutlined />} />
+            <Avatar
+              src={getFullImageUrl(record.imageUrl)}
+              icon={<UserOutlined />}
+            />
             <div>
               <Text strong>{record.displayName}</Text>
               <br />
@@ -398,15 +433,6 @@ const UserManagementPage: React.FC = () => {
           <Tag color={isActive ? "green" : "default"}>
             {isActive ? "Hoạt động" : "Tạm dừng"}
           </Tag>
-        ),
-      },
-      {
-        title: "Ngày tạo",
-        dataIndex: "createdAt",
-        key: "createdAt",
-        width: 150,
-        render: (date: string) => (
-          <Text type="secondary">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text>
         ),
       },
       {
@@ -562,7 +588,9 @@ const UserManagementPage: React.FC = () => {
           userData={userDetailById[viewingUserId] || null}
           loading={statusById[viewingUserId] === "loading"}
           submitLoading={
-            viewingUserId ? updateStatusById[viewingUserId] === "loading" : false
+            viewingUserId
+              ? updateStatusById[viewingUserId] === "loading"
+              : false
           }
           mode={detailModalMode}
           onModeChange={handleDetailModalModeChange}
@@ -587,7 +615,9 @@ const UserManagementPage: React.FC = () => {
         onSubmit={handleResetPassword}
         userName={resettingUser?.displayName}
         loading={
-          resettingUser ? resetPasswordStatusById[resettingUser.id] === "loading" : false
+          resettingUser
+            ? resetPasswordStatusById[resettingUser.id] === "loading"
+            : false
         }
       />
     </div>
@@ -595,4 +625,3 @@ const UserManagementPage: React.FC = () => {
 };
 
 export default UserManagementPage;
-

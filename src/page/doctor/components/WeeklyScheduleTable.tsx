@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../store/Store";
 import { getAdminTimeSlotsAsync } from "../../../store/doctor/adminTimeSlotSlice";
 import { DoctorTimeSlot, TimeSlotSelection } from "../types";
-
+import { normalizeDayOfWeek } from "../utils/dayOfWeek";
 
 interface WeeklyScheduleTableProps {
   onSelectionChange?: (selections: TimeSlotSelection[]) => void;
@@ -40,7 +40,7 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
   // Initialize table data - memoized
   const initializeTableData = useCallback((): ShiftRow[] => {
     if (!timeSlotsData) return [];
-    
+
     return timeSlotsData.map((slot) => ({
       key: slot.id,
       timeSlot: slot.displayText || `${slot.startTime} - ${slot.endTime}`,
@@ -56,6 +56,7 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
   }, [timeSlotsData]);
 
   // Helper function to convert dayOfWeek to day key
+  // Backend uses: Monday = 1, Tuesday = 2, ..., Saturday = 6, Sunday = 7
   const getDayKey = (dayOfWeek: number): keyof ShiftRow | null => {
     const dayMapping: { [key: number]: keyof ShiftRow } = {
       1: "monday",
@@ -64,8 +65,7 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
       4: "thursday",
       5: "friday",
       6: "saturday",
-      0: "sunday", // Sunday is 0
-      7: "sunday", // Some systems use 7 for Sunday
+      7: "sunday",
     };
     return dayMapping[dayOfWeek] || null;
   };
@@ -84,25 +84,52 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
 
       // Apply initial selected time slots if provided
       if (initialSelectedTimeSlots.length > 0) {
-        console.log("Applying initial time slots:", initialSelectedTimeSlots);
+        console.log("=== Applying initial time slots ===");
+        console.log(
+          "Initial time slots from API:",
+          JSON.stringify(initialSelectedTimeSlots, null, 2)
+        );
+
         const updated = initialized.map((row) => {
           const newRow = { ...row };
           initialSelectedTimeSlots.forEach((ts) => {
-            console.log(
-              `Checking timeSlot: ${ts.timeSlotId} vs row: ${row.timeSlotId}`
-            );
             if (ts.timeSlotId === row.timeSlotId) {
-              const dayKey = getDayKey(ts.dayOfWeek);
-              console.log(`Day of week: ${ts.dayOfWeek} -> dayKey: ${dayKey}`);
+              // Normalize dayOfWeek to handle both old (0-6) and new (1-7) formats
+              const normalizedDay = normalizeDayOfWeek(ts.dayOfWeek);
+              const dayKey = getDayKey(normalizedDay);
+              console.log(
+                `✅ Match found! TimeSlot: ${ts.timeSlotId}, Original DayOfWeek: ${ts.dayOfWeek}, Normalized: ${normalizedDay} (${dayKey})`
+              );
               if (dayKey) {
-                console.log(`Setting ${dayKey} for timeSlot ${ts.timeSlotId}`);
                 (newRow as any)[dayKey] = true;
+              } else {
+                console.error(
+                  `❌ Invalid dayOfWeek value: ${ts.dayOfWeek} -> ${normalizedDay} (expected 1-7 after normalization)`
+                );
               }
             }
           });
           return newRow;
         });
-        console.log("Updated table data:", updated);
+
+        console.log("=== Updated table data ===");
+        console.log(
+          JSON.stringify(
+            updated.filter(
+              (row) =>
+                row.monday ||
+                row.tuesday ||
+                row.wednesday ||
+                row.thursday ||
+                row.friday ||
+                row.saturday ||
+                row.sunday
+            ),
+            null,
+            2
+          )
+        );
+
         setSelectedShifts(updated);
         // Notify parent about the initial selections
         notifySelectionChange(updated);
@@ -121,132 +148,141 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
   };
 
   // Notify parent component of selection changes - memoized
-  const notifySelectionChange = useCallback((data: ShiftRow[]) => {
-    if (!onSelectionChange) return;
+  const notifySelectionChange = useCallback(
+    (data: ShiftRow[]) => {
+      if (!onSelectionChange) return;
 
-    const selections: TimeSlotSelection[] = [];
-    const dayMapping = [
-      { key: "sunday", name: "Chủ nhật", dayOfWeek: 0 },
-      { key: "monday", name: "Thứ 2", dayOfWeek: 1 },
-      { key: "tuesday", name: "Thứ 3", dayOfWeek: 2 },
-      { key: "wednesday", name: "Thứ 4", dayOfWeek: 3 },
-      { key: "thursday", name: "Thứ 5", dayOfWeek: 4 },
-      { key: "friday", name: "Thứ 6", dayOfWeek: 5 },
-      { key: "saturday", name: "Thứ 7", dayOfWeek: 6 },
-    ];
-
-    data.forEach((row) => {
-      dayMapping.forEach((day) => {
-        if (row[day.key as keyof ShiftRow]) {
-          selections.push({
-            timeSlotId: row.timeSlotId,
-            timeSlotText: row.timeSlot,
-            dayOfWeek: day.dayOfWeek,
-            dayName: day.name,
-          });
-        }
-      });
-    });
-
-    onSelectionChange(selections);
-  }, [onSelectionChange]);
-
-  // Handle checkbox change - memoized
-  const handleCheckboxChange = useCallback((
-    rowKey: string,
-    dayKey: keyof ShiftRow,
-    checked: boolean
-  ) => {
-    console.log("handleCheckboxChange called:", { rowKey, dayKey, checked });
-    setSelectedShifts(prevShifts => {
-      const newData = prevShifts.map((row) => {
-        if (row.key === rowKey) {
-          return { ...row, [dayKey]: checked };
-        }
-        return row;
-      });
-      console.log("Updated shifts:", newData);
-      notifySelectionChange(newData);
-      return newData;
-    });
-  }, [notifySelectionChange]);
-
-  // Handle select all for a day - memoized
-  const handleSelectAllDay = useCallback((dayKey: keyof ShiftRow) => {
-    setSelectedShifts(prevShifts => {
-      const allChecked = prevShifts.every((row) => row[dayKey]);
-      const newData = prevShifts.map((row) => ({
-        ...row,
-        [dayKey]: !allChecked,
-      }));
-      notifySelectionChange(newData);
-      return newData;
-    });
-  }, [notifySelectionChange]);
-
-  // Handle select all for a time slot - memoized
-  const handleSelectAllSlot = useCallback((rowKey: string) => {
-    const dayKeys: (keyof ShiftRow)[] = [
-      "monday",
-      "tuesday",
-      "wednesday",
-      "thursday",
-      "friday",
-      "saturday",
-      "sunday",
-    ];
-
-    setSelectedShifts(prevShifts => {
-      const row = prevShifts.find((r) => r.key === rowKey);
-      const allChecked = dayKeys.every((key) => row?.[key]);
-
-      const newData = prevShifts.map((r) => {
-        if (r.key === rowKey) {
-          const updated = { ...r };
-          dayKeys.forEach((key) => {
-            (updated as any)[key] = !allChecked;
-          });
-          return updated;
-        }
-        return r;
-      });
-      notifySelectionChange(newData);
-      return newData;
-    });
-  }, [notifySelectionChange]);
-
-  // Submit selected shifts
-  const handleSubmit = () => {
-    const selected: any[] = [];
-
-    selectedShifts.forEach((row) => {
-      const dayKeys = [
-        { key: "monday", name: "Thứ 2" },
-        { key: "tuesday", name: "Thứ 3" },
-        { key: "wednesday", name: "Thứ 4" },
-        { key: "thursday", name: "Thứ 5" },
-        { key: "friday", name: "Thứ 6" },
-        { key: "saturday", name: "Thứ 7" },
-        { key: "sunday", name: "Chủ nhật" },
+      const selections: TimeSlotSelection[] = [];
+      // Backend uses: Monday = 1, Tuesday = 2, ..., Saturday = 6, Sunday = 7
+      const dayMapping = [
+        { key: "monday", name: "Thứ 2", dayOfWeek: 1 },
+        { key: "tuesday", name: "Thứ 3", dayOfWeek: 2 },
+        { key: "wednesday", name: "Thứ 4", dayOfWeek: 3 },
+        { key: "thursday", name: "Thứ 5", dayOfWeek: 4 },
+        { key: "friday", name: "Thứ 6", dayOfWeek: 5 },
+        { key: "saturday", name: "Thứ 7", dayOfWeek: 6 },
+        { key: "sunday", name: "Chủ nhật", dayOfWeek: 7 },
       ];
 
-      dayKeys.forEach((day) => {
-        if (row[day.key as keyof ShiftRow]) {
-          selected.push({
-            timeSlotId: row.timeSlotId,
-            timeSlot: row.timeSlot,
-            dayOfWeek: day.name,
-            dayKey: day.key,
-          });
-        }
+      data.forEach((row) => {
+        dayMapping.forEach((day) => {
+          if (row[day.key as keyof ShiftRow]) {
+            selections.push({
+              timeSlotId: row.timeSlotId,
+              timeSlotText: row.timeSlot,
+              dayOfWeek: day.dayOfWeek,
+              dayName: day.name,
+            });
+          }
+        });
       });
-    });
 
-    console.log("Selected shifts:", selected);
-    message.success(`Đã chọn ${selected.length} ca làm việc`);
+      onSelectionChange(selections);
+    },
+    [onSelectionChange]
+  );
 
-    // Call API here to save selected shifts
-  };
+  // Handle checkbox change - memoized
+  const handleCheckboxChange = useCallback(
+    (rowKey: string, dayKey: keyof ShiftRow, checked: boolean) => {
+      console.log("handleCheckboxChange called:", { rowKey, dayKey, checked });
+      setSelectedShifts((prevShifts) => {
+        const newData = prevShifts.map((row) => {
+          if (row.key === rowKey) {
+            return { ...row, [dayKey]: checked };
+          }
+          return row;
+        });
+        console.log("Updated shifts:", newData);
+        notifySelectionChange(newData);
+        return newData;
+      });
+    },
+    [notifySelectionChange]
+  );
+
+  // Handle select all for a day - memoized
+  const handleSelectAllDay = useCallback(
+    (dayKey: keyof ShiftRow) => {
+      setSelectedShifts((prevShifts) => {
+        const allChecked = prevShifts.every((row) => row[dayKey]);
+        const newData = prevShifts.map((row) => ({
+          ...row,
+          [dayKey]: !allChecked,
+        }));
+        notifySelectionChange(newData);
+        return newData;
+      });
+    },
+    [notifySelectionChange]
+  );
+
+  // Handle select all for a time slot - memoized
+  const handleSelectAllSlot = useCallback(
+    (rowKey: string) => {
+      const dayKeys: (keyof ShiftRow)[] = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ];
+
+      setSelectedShifts((prevShifts) => {
+        const row = prevShifts.find((r) => r.key === rowKey);
+        const allChecked = dayKeys.every((key) => row?.[key]);
+
+        const newData = prevShifts.map((r) => {
+          if (r.key === rowKey) {
+            const updated = { ...r };
+            dayKeys.forEach((key) => {
+              (updated as any)[key] = !allChecked;
+            });
+            return updated;
+          }
+          return r;
+        });
+        notifySelectionChange(newData);
+        return newData;
+      });
+    },
+    [notifySelectionChange]
+  );
+
+  // Submit selected shifts
+  // const handleSubmit = () => {
+  //   const selected: any[] = [];
+
+  //   selectedShifts.forEach((row) => {
+  //     const dayKeys = [
+  //       { key: "monday", name: "Thứ 2" },
+  //       { key: "tuesday", name: "Thứ 3" },
+  //       { key: "wednesday", name: "Thứ 4" },
+  //       { key: "thursday", name: "Thứ 5" },
+  //       { key: "friday", name: "Thứ 6" },
+  //       { key: "saturday", name: "Thứ 7" },
+  //       { key: "sunday", name: "Chủ nhật" },
+  //     ];
+
+  //     dayKeys.forEach((day) => {
+  //       if (row[day.key as keyof ShiftRow]) {
+  //         selected.push({
+  //           timeSlotId: row.timeSlotId,
+  //           timeSlot: row.timeSlot,
+  //           dayOfWeek: day.name,
+  //           dayKey: day.key,
+  //         });
+  //       }
+  //     });
+  //   });
+
+  //   console.log("Selected shifts:", selected);
+  //   message.success(`Đã chọn ${selected.length} ca làm việc`);
+
+  //   // Call API here to save selected shifts
+  // };
 
   // Clear all selections - memoized
   const handleClear = useCallback(() => {
@@ -257,24 +293,24 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
   }, [initializeTableData, notifySelectionChange]);
 
   // Count selected shifts - memoized
-  const countSelected = useMemo(() => {
-    let count = 0;
-    selectedShifts.forEach((row) => {
-      const dayKeys: (keyof ShiftRow)[] = [
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday",
-      ];
-      dayKeys.forEach((key) => {
-        if (row[key]) count++;
-      });
-    });
-    return count;
-  }, [selectedShifts]);
+  // const countSelected = useMemo(() => {
+  //   let count = 0;
+  //   selectedShifts.forEach((row) => {
+  //     const dayKeys: (keyof ShiftRow)[] = [
+  //       "monday",
+  //       "tuesday",
+  //       "wednesday",
+  //       "thursday",
+  //       "friday",
+  //       "saturday",
+  //       "sunday",
+  //     ];
+  //     dayKeys.forEach((key) => {
+  //       if (row[key]) count++;
+  //     });
+  //   });
+  //   return count;
+  // }, [selectedShifts]);
 
   // Create columns with handlers - memoized
   const tableColumns = useMemo(() => {
@@ -308,13 +344,13 @@ const WeeklyScheduleTable: React.FC<WeeklyScheduleTableProps> = ({
         }}
       >
         <Button onClick={handleClear}>Xóa tất cả</Button>
-        <Button
+        {/* <Button
           type="primary"
           onClick={handleSubmit}
           disabled={countSelected === 0}
         >
           Xác nhận ({countSelected} ca)
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

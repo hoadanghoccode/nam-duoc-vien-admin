@@ -17,7 +17,6 @@ import {
   Select,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import dayjs from "dayjs";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getFullImageUrl, uploadImageToCloud } from "../../helpers/upload";
@@ -35,6 +34,7 @@ import DoctorModal from "./components/DoctorModal";
 import { DoctorFormData } from "./types";
 import { getAdminMedicalFacilitiesAsync } from "../../store/facilities/adminMedicalFacilitySlice";
 import { getSpecialtiesAsync } from "../../store/specialty/specialtySlice";
+import { normalizeDayOfWeek } from "./utils/dayOfWeek";
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -239,7 +239,7 @@ const DoctorManagementPage: React.FC = () => {
         timeSlots:
           doctorDetailData?.timeSlots?.map((ts: any) => ({
             timeSlotId: ts.timeSlot?.id || ts.timeSlotId,
-            dayOfWeek: ts.dayOfWeek,
+            dayOfWeek: normalizeDayOfWeek(ts.dayOfWeek), // Convert old format (0-6) to new format (1-7)
             isActive: ts.isActive,
           })) || [],
       };
@@ -490,15 +490,6 @@ const DoctorManagementPage: React.FC = () => {
         <Tag color={isActive ? "green" : "red"}>
           {isActive ? "Hoạt động" : "Tạm dừng"}
         </Tag>
-      ),
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: 150,
-      render: (date: string) => (
-        <Text type="secondary">{dayjs(date).format("DD/MM/YYYY HH:mm")}</Text>
       ),
     },
     {

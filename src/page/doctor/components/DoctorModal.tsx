@@ -34,6 +34,7 @@ import { getAdminTimeSlotsAsync } from "../../../store/doctor/adminTimeSlotSlice
 import { getFullImageUrl } from "../../../helpers/upload";
 import { DoctorFormData, TimeSlotSelection, DoctorTimeSlot } from "../types";
 import WeeklyScheduleTable from "./WeeklyScheduleTable";
+import { getDayName as getDayNameUtil } from "../utils/dayOfWeek";
 import dayjs from "dayjs";
 
 const { Option } = Select;
@@ -206,13 +207,20 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
       
       // Convert initial time slots to selections and show schedule table
       if (initialValues.timeSlots && initialValues.timeSlots.length > 0) {
-        console.log("Setting time slots:", initialValues.timeSlots);
-        const selections: TimeSlotSelection[] = initialValues.timeSlots.map(ts => ({
-          timeSlotId: ts.timeSlotId,
-          timeSlotText: "", // Will be filled by the table component
-          dayOfWeek: ts.dayOfWeek,
-          dayName: "", // Will be filled by the table component
-        }));
+        console.log("=== DoctorModal: Setting time slots ===");
+        console.log("Time slots from initialValues:", JSON.stringify(initialValues.timeSlots, null, 2));
+        
+        const selections: TimeSlotSelection[] = initialValues.timeSlots.map(ts => {
+          console.log(`Mapping timeSlot: ${ts.timeSlotId}, dayOfWeek: ${ts.dayOfWeek}`);
+          return {
+            timeSlotId: ts.timeSlotId,
+            timeSlotText: "", // Will be filled by the table component
+            dayOfWeek: ts.dayOfWeek,
+            dayName: "", // Will be filled by the table component
+          };
+        });
+        
+        console.log("Converted selections:", JSON.stringify(selections, null, 2));
         setSelectedTimeSlots(selections);
         setShowScheduleTable(true); // Auto show schedule table if there are time slots
       }
@@ -307,11 +315,6 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
   }, [visible, initialValues, specialtiesData, specialtiesLoading, form]);
 
   // Helper functions for view mode
-  const getDayName = (dayOfWeek: number): string => {
-    const days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
-    return days[dayOfWeek] || '';
-  };
-
   const getTimeSlotText = (timeSlotId: string): string => {
     // Try to find the time slot in timeSlotsData
     if (timeSlotsData && timeSlotsData.length > 0) {
@@ -328,22 +331,36 @@ const DoctorModal: React.FC<DoctorModalProps> = ({
 
   // Group time slots by day for table display
   const groupTimeSlotsByDay = (timeSlots: DoctorTimeSlot[]) => {
+    console.log("=== Grouping time slots for view mode ===");
+    console.log("Input timeSlots:", JSON.stringify(timeSlots, null, 2));
+    
     const grouped: { [key: number]: string[] } = {};
     
     timeSlots.forEach(slot => {
+      console.log(`Processing slot: timeSlotId=${slot.timeSlotId}, dayOfWeek=${slot.dayOfWeek}`);
       if (!grouped[slot.dayOfWeek]) {
         grouped[slot.dayOfWeek] = [];
       }
-      grouped[slot.dayOfWeek].push(getTimeSlotText(slot.timeSlotId));
+      const timeText = getTimeSlotText(slot.timeSlotId);
+      grouped[slot.dayOfWeek].push(timeText);
+      console.log(`Added "${timeText}" to day ${slot.dayOfWeek}`);
     });
 
-    return Object.entries(grouped).map(([day, slots]) => ({
-      key: day,
-      dayOfWeek: parseInt(day),
-      dayName: getDayName(parseInt(day)),
-      timeSlots: slots,
-      slotCount: slots.length,
-    }));
+    console.log("Grouped data:", grouped);
+
+    // Sort by dayOfWeek (1-7: Monday to Sunday)
+    const result = Object.entries(grouped)
+      .map(([day, slots]) => ({
+        key: day,
+        dayOfWeek: parseInt(day),
+        dayName: getDayNameUtil(parseInt(day)),
+        timeSlots: slots,
+        slotCount: slots.length,
+      }))
+      .sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+      
+    console.log("Final grouped result:", JSON.stringify(result, null, 2));
+    return result;
   };
 
   return (

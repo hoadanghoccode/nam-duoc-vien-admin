@@ -29,7 +29,7 @@ export const getAdminSpecialtiesByFacilityAsync = createAsyncThunk(
       return { facilityId: params.facilityId, data: res.data };
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message ||
+        err?.response?.data?.errorMessage ||
           "Lấy danh sách chuyên khoa theo cơ sở thất bại!"
       );
     }

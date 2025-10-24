@@ -24,10 +24,10 @@ const getDefaultDateRange = () => {
   const today = new Date();
   const oneMonthLater = new Date();
   oneMonthLater.setMonth(today.getMonth() + 1);
-  
+
   return {
-    fromDate: today.toISOString().split('T')[0], // YYYY-MM-DD format
-    toDate: oneMonthLater.toISOString().split('T')[0],
+    fromDate: today.toISOString().split("T")[0], // YYYY-MM-DD format
+    toDate: oneMonthLater.toISOString().split("T")[0],
   };
 };
 
@@ -43,12 +43,12 @@ export const fetchTopDoctors = createAsyncThunk(
         ...defaultRange,
         ...params,
       };
-      
+
       const response = await adminRevenueByDoctorApi.getTopDoctors(queryParams);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch top doctors"
+        error?.response?.data?.errorMessage || "Failed to fetch top doctors"
       );
     }
   }

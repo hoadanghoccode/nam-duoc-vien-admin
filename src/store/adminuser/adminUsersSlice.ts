@@ -63,7 +63,7 @@ export const getAdminUsersAsync = createAsyncThunk<
     return normalizeResponse(res.data as any, q);
   } catch (err: any) {
     const msg =
-      err?.response?.data?.message ||
+      err?.response?.data?.errorMessage ||
       err?.message ||
       "Không tải được danh sách người dùng";
     return rejectWithValue(msg);
@@ -95,9 +95,8 @@ const adminUsersSlice = createSlice({
           ...action.payload,
           items: action.payload.items.map((user: any) => ({
             ...user,
-            role: user.roles && user.roles.length > 0 
-              ? user.roles[0].name 
-              : "User",
+            role:
+              user.roles && user.roles.length > 0 ? user.roles[0].name : "User",
           })),
         };
         state.data = mappedData;

@@ -29,7 +29,7 @@ export const confirmAppointmentAdminAsync = createAsyncThunk(
       return res.data;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Xác nhận lịch hẹn thất bại!"
+        err?.response?.data?.errorMessage || "Xác nhận lịch hẹn thất bại!"
       );
     }
   }

@@ -30,7 +30,7 @@ export const updateAdminUserAsync = createAsyncThunk<
     return { id: userId, data: res.data };
   } catch (err: any) {
     const msg =
-      err?.response?.data?.message ||
+      err?.response?.data?.errorMessage ||
       err?.message ||
       "Không thể cập nhật người dùng.";
     return rejectWithValue(msg);
@@ -66,9 +66,10 @@ const updateAdminUserSlice = createSlice({
         // Map roles array to role string for display
         const mappedData: any = {
           ...data,
-          role: data.roles && data.roles.length > 0 
-            ? (data.roles[0] as any).name 
-            : "User",
+          role:
+            data.roles && data.roles.length > 0
+              ? (data.roles[0] as any).name
+              : "User",
         };
         s.statusById[id] = "succeeded";
         s.resultById[id] = mappedData;

@@ -28,7 +28,8 @@ export const fetchRevenueByDoctor = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data || "Failed to fetch revenue by doctor"
+        error?.response?.data?.errorMessage ||
+          "Failed to fetch revenue by doctor"
       );
     }
   }

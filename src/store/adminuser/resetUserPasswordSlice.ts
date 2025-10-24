@@ -29,7 +29,7 @@ export const resetUserPasswordAsync = createAsyncThunk<
     return { id: userId, data: res.data };
   } catch (err: any) {
     const msg =
-      err?.response?.data?.message ||
+      err?.response?.data?.errorMessage ||
       err?.message ||
       "Không thể reset mật khẩu người dùng.";
     return rejectWithValue(msg);

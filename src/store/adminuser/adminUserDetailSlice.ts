@@ -27,7 +27,7 @@ export const getAdminUserByIdAsync = createAsyncThunk<
     return { id: userId, data: res.data };
   } catch (err: any) {
     const msg =
-      err?.response?.data?.message ||
+      err?.response?.data?.errorMessage ||
       err?.message ||
       "Không tải được thông tin người dùng";
     return rejectWithValue(msg);
@@ -66,7 +66,9 @@ const adminUserDetailSlice = createSlice({
       .addCase(getAdminUserByIdAsync.fulfilled, (s, a) => {
         const { id, data } = a.payload;
         // Map roles array to role string for display (ensure it's the exact union type)
-        const mapRole = (roles?: { name: string }[]): AdminUserDetail["role"] => {
+        const mapRole = (
+          roles?: { name: string }[]
+        ): AdminUserDetail["role"] => {
           if (!roles || roles.length === 0) return "User";
           return roles[0].name === "Admin" ? "Admin" : "User";
         };

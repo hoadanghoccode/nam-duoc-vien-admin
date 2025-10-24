@@ -30,7 +30,7 @@ export const completeAppointmentAdminAsync = createAsyncThunk(
       return { id: args.id };
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Hoàn tất lịch hẹn thất bại!"
+        err?.response?.data?.errorMessage || "Hoàn tất lịch hẹn thất bại!"
       );
     }
   }

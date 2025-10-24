@@ -22,10 +22,10 @@ const getDefaultDateRange = () => {
   const today = new Date();
   const oneMonthLater = new Date();
   oneMonthLater.setMonth(today.getMonth() + 1);
-  
+
   return {
-    FromDate: today.toISOString().split('T')[0], // YYYY-MM-DD format
-    ToDate: oneMonthLater.toISOString().split('T')[0],
+    FromDate: today.toISOString().split("T")[0], // YYYY-MM-DD format
+    ToDate: oneMonthLater.toISOString().split("T")[0],
   };
 };
 
@@ -42,12 +42,14 @@ export const fetchRevenueByPeriod = createAsyncThunk<
       PeriodType: "daily" as const,
       ...params,
     };
-    
-    const response = await adminRevenueByDoctorApi.getRevenueByPeriod(queryParams);
+
+    const response = await adminRevenueByDoctorApi.getRevenueByPeriod(
+      queryParams
+    );
     return response.data;
   } catch (err: any) {
     return rejectWithValue(
-      err.response?.data || "Lỗi khi tải doanh thu theo kỳ"
+      err?.response?.data?.errorMessage || "Lỗi khi tải doanh thu theo kỳ"
     );
   }
 });

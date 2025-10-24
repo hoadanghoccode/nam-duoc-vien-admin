@@ -23,10 +23,10 @@ const getDefaultDateRange = () => {
   const today = new Date();
   const oneMonthLater = new Date();
   oneMonthLater.setMonth(today.getMonth() + 1);
-  
+
   return {
-    fromDate: today.toISOString().split('T')[0], // YYYY-MM-DD format
-    toDate: oneMonthLater.toISOString().split('T')[0],
+    fromDate: today.toISOString().split("T")[0], // YYYY-MM-DD format
+    toDate: oneMonthLater.toISOString().split("T")[0],
   };
 };
 
@@ -40,12 +40,15 @@ export const fetchAdminRevenueOverviewAsync = createAsyncThunk(
         ...defaultRange,
         ...query, // Override nếu có params được truyền vào
       };
-      
-      const response = await adminRevenueByDoctorApi.getRevenueOverview(queryParams);
+
+      const response = await adminRevenueByDoctorApi.getRevenueOverview(
+        queryParams
+      );
       return response.data;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Không thể tải tổng quan doanh thu!"
+        err?.response?.data?.errorMessage ||
+          "Không thể tải tổng quan doanh thu!"
       );
     }
   }

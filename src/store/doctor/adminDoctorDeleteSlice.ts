@@ -23,7 +23,7 @@ export const deleteAdminDoctorAsync = createAsyncThunk(
       return res;
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Xóa bác sĩ thất bại!"
+        err?.response?.data?.errorMessage || "Xóa bác sĩ thất bại!"
       );
     }
   }

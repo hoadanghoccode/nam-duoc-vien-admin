@@ -28,7 +28,7 @@ export const getAdminAppointmentsAsync = createAsyncThunk(
       return { data: res.data, query: params };
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Lấy danh sách lịch hẹn thất bại!"
+        err?.response?.data?.errorMessage || "Lấy danh sách lịch hẹn thất bại!"
       );
     }
   }

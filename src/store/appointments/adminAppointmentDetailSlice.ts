@@ -25,7 +25,7 @@ export const getAdminAppointmentDetailAsync = createAsyncThunk(
       return { data: res.data, id };
     } catch (err: any) {
       return rejectWithValue(
-        err?.response?.data?.message || "Lấy chi tiết lịch hẹn thất bại!"
+        err?.response?.data?.errorMessage || "Lấy chi tiết lịch hẹn thất bại!"
       );
     }
   }
